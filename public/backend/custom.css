@@ -1,0 +1,49 @@
+.custom-modal {
+    background: #009688;
+    color: #fff;
+}
+.container-fluid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+.bootstrap-select .dropdown-toggle:focus,
+.dropdown-toggle:active,
+.filter-option:focus {
+    outline: none !important;
+}
+
+.form-group {
+    margin-bottom: 10px !important;
+}
+
+.bootstrap-select .dropdown-toggle:focus {
+    outline: 0 dotted #333333 !important;
+    outline: 0 auto -webkit-focus-ring-color !important;
+    outline-offset: 0 !important;
+
+}
+.custom-btn {
+    min-width: 120px;
+}
+
+.sidebar .menu  .list li.active a span, .sidebar .menu .list li.active i.material-icons  {
+    color: #f00 !important;
+}
+
+button.dt-button:hover:not(.disabled), div.dt-button:hover:not(.disabled), a.dt-button:hover:not(.disabled), input.dt-button:hover:not(.disabled) {
+     border: 0px solid #666 !important; 
+     background: #607D8B !important; 
+
+    
+}
+.btn {
+    margin-top: 3px !important;
+    margin-bottom: 3px !important;
+}
+.select2-container--default .select2-selection--single{
+    border-radius: 0 !important;
+}
+
+.block-header > button, .block-header > a {
+    margin-bottom: 10px !important;
+}
