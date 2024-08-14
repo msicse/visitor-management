@@ -85,8 +85,9 @@
                                                 <select name="visitor_type" class="form-select form-select-sm"
                                                     id="organization-type" required>
                                                     <option value="">Select </option>
-                                                    <option value="factory">Factory </option>
                                                     <option value="brand">Brand </option>
+                                                    <option value="factory">Factory </option>
+                                                    <option value="trade-union">Trade Union </option>
                                                     <option value="official">Others </option>
                                                 </select>
                                                 <label id="organization-type-error" class="error"
@@ -107,10 +108,12 @@
                                             </div>
 
                                             <div class="form-group mb-3">
-                                                <label for="reason" class="form-label">Reason <span
-                                                        class="text-danger font-bold">*</span></label>
-                                                <textarea class="form-control" placeholder="Reason" id="reason" style="height: 60px" required></textarea>
+                                                <label for="address" class="form-label">Address <span
+                                                        class="text-danger font-bold">*</span> </label>
+                                                <textarea class="form-control" name="address" placeholder="Address" id="address" style="height: 60px" required></textarea>
                                             </div>
+
+                                            
 
                                         </div>
                                         <div class="col">
@@ -148,18 +151,19 @@
                                             </div>
 
                                             <div class="form-group mb-3">
-                                                <label for="address" class="form-label">Address <span
-                                                        class="text-danger font-bold">*</span> </label>
-                                                <textarea class="form-control" name="address" placeholder="Address" id="address" style="height: 60px" required></textarea>
+                                                <label for="reason" class="form-label">Reason <span
+                                                        class="text-danger font-bold">*</span></label>
+                                                <textarea class="form-control" placeholder="Reason" id="reason" style="height: 60px" required></textarea>
                                             </div>
+
+                                            
 
                                         </div>
                                     </div>
 
                                     <div class="row mt-3">
                                         <div class="col-12 text-end mb-2">
-                                            <button type="button" id="addVisitor" class="btn btn-sm btn-primary ">Add
-                                                Guest</button>
+                                            <button type="button" id="addVisitor" class="btn btn-sm btn-primary ">Accopanied By</button>
                                         </div>
                                         <div class="col-12">
                                             <div class="table-responsive">
@@ -167,7 +171,7 @@
                                                     <thead>
                                                         <tr>
                                                             <th>SL</th>
-                                                            <th>Guest Name </th>
+                                                            <th>Name </th>
                                                             <th>Organization Name </th>
                                                             <th>Phone</th>
                                                             <th>Email</th>
