@@ -15,7 +15,7 @@
 @section('content')
 <div class="container-fluid">
     <div class="block-header">
-        <a href="{{ route('visitors.create') }}" class="btn btn-primary waves-effect pull-right" style="margin-bottom:10px;" >
+        <a href="{{ route('home') }}" target="_blank" class="btn btn-primary waves-effect pull-right" style="margin-bottom:10px;" >
             <i class="material-icons">add</i>
             <span>Add New Visitor</span>
         </a>
@@ -29,7 +29,7 @@
                     <h2>
                         All Visitors
                         <span class="badge ">{{ $visitors->count() }}</span>
-                        
+
                     </h2>
                 </div>
                 <div class="body">
@@ -72,17 +72,17 @@
                                     <td>{{ $data->name }}</td>
                                     <td>{{ $data->factory_name }}</td>
                                     <td>{{ $data->phone }} </td>
-                                    <td>{{ $data->in_time }} </td>
+                                    <td>{{ date('d-m-Y h:i a', $data->in_titme) }} </td>
                                     <td>{{ $data->out_time }} </td>
                                     <td>{{ $data->employee->name }} </td>
-                                   
+
                                     <td>
                                         <a href="{{ route('visitors.show', $data->id) }}" class="btn btn-info waves-effect " style="width: 100px;" title="View Visitor" >
                                             <i class="material-icons">visibility</i>
                                             View
                                         </a>
 
-                                   
+
                                         @if($data->checkout != 1)
                                         <button type="button" class="btn btn-danger waves-effect delete" data-delete-id="{{$data->id}}" style="width: 100px;" data-toggle="modal" title="Checkedout Visitor" data-target="#delete-modal" >
                                             <i class="material-icons">exit_to_app</i>
@@ -147,7 +147,7 @@
     <script src="{{ asset('backend/plugins/jquery-datatable/extensions/export/buttons.print.min.js') }}"></script>
 
 
-    
+
 
     <script src="{{ asset('backend/js/pages/tables/jquery-datatable.js') }}"></script>
 
