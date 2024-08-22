@@ -121,16 +121,16 @@
                                                 <i class="material-icons">visibility</i>
                                                 View
                                             </a>
-    
-                                       
+
+
                                             @if($data->checkout != 1)
                                             <button type="button" class="btn btn-danger waves-effect delete" data-delete-id="{{$data->id}}" data-toggle="modal" title="Disable Visitor" data-target="#delete-modal" >
                                                 <i class="material-icons">exit_to_app</i>
                                                 Checkout
                                             </button>
                                             @endif
-    
-    
+
+
                                         </td>
                                     </tr>
                                     @endforeach
@@ -181,12 +181,20 @@
     </script>
 
 
+
+
     <script>
         $('.datepicker').bootstrapMaterialDatePicker({
             format: 'dddd DD MMMM YYYY',
             clearButton: true,
             weekStart: 1,
             time: false
+        });
+        $(".delete").click(function() {
+            var data_id = $(this).data('delete-id');
+            var url = location.origin + '/visitors/checkout/' + data_id;
+            $('.delete_form').attr('action', url);
+
         });
     </script>
 @endpush

@@ -57,9 +57,9 @@
                                     <td>{{ $data->short_name }}</td>
                                     <td>{{$data->employees->count() }}</td>
                                     <td>
-                                        <button type="button" class="btn btn-success waves-effect " data-toggle="modal" data-target="#">
+                                        {{-- <button type="button" class="btn btn-success waves-effect " data-toggle="modal" data-target="#">
                                             <i class="material-icons">visibility</i>
-                                        </button>
+                                        </button> --}}
 
                                         <button type="button" class="btn btn-success waves-effect edit" data-id="{{$data->id}}" data-toggle="modal"
                                             data-target="#editModal">
@@ -98,14 +98,14 @@
                         <label class="form-label">Department Name</label>
                         <div class="form-line">
                             <input type="text" name="name" class="form-control" required>
-                            
+
                         </div>
                     </div>
                     <div class="form-group form-float">
                         <label class="form-label">Short Name</label>
                         <div class="form-line">
                             <input type="text" name="short_name" class="form-control" required>
-                            
+
                         </div>
                     </div>
 
@@ -134,14 +134,14 @@
                         <label class="form-label">Department Name</label>
                         <div class="form-line">
                             <input type="text" id="name" name="name" class="form-control" required>
-                            
+
                         </div>
                     </div>
                     <div class="form-group form-float">
                         <label class="form-label">Short Name</label>
                         <div class="form-line">
                             <input type="text" id="short_name" name="short_name" class="form-control" required>
-                            
+
                         </div>
                     </div>
 
@@ -210,7 +210,7 @@ $( ".edit" ).click(function( event ) {
     $.get(url, function (data) {
         $('#name').val(data['name']);
         $('#short_name').val(data['short_name']);
-       
+
     });
 });
 $( ".delete" ).click(function() {

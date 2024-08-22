@@ -79,15 +79,15 @@
                                         <a href="{{ route('employees.edit', $data->id) }}" class="btn btn-warning waves-effect edit" title="Edit Employee">
                                             <i class="material-icons">create</i>
                                         </a>
-                                        @if($data->status == 1)
+                                        {{-- if($data->status == 1)
                                         <button type="button" class="btn btn-danger waves-effect delete" data-delete-id="{{$data->id}}" data-toggle="modal" title="Disable Employee" data-target="#delete-modal" >
                                             <i class="material-icons">person_off</i>
                                         </button>
-                                        @else
+                                        else
                                         <button type="button" class="btn btn-success waves-effect delete" data-delete-id="{{$data->id}}" data-toggle="modal" data-target="#delete-modal" title="Enable Employee" >
                                             <i class="material-icons">person</i>
                                         </button>
-                                        @endif
+                                        endif --}}
 
 
                                     </td>
@@ -146,7 +146,7 @@
     <script src="{{ asset('backend/plugins/jquery-datatable/extensions/export/buttons.print.min.js') }}"></script>
 
 
-    
+
 
     <script src="{{ asset('backend/js/pages/tables/jquery-datatable.js') }}"></script>
 
@@ -154,7 +154,7 @@
 
 $( ".delete" ).click(function() {
     var data_id=$(this).data('delete-id');
-    var url=location.origin+'/admin/employees/status/'+data_id;
+    var url=location.origin+'/employees/status/'+data_id;
     $('.delete_form').attr('action',url);
 
 });

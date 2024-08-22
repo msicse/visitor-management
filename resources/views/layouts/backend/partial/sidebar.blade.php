@@ -29,6 +29,7 @@
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
+
                 </ul>
             </div>
         </div>
@@ -59,19 +60,14 @@
                     <span>Employees</span>
                 </a>
             </li>
-            <li class="">
-                <a href="{{ route('visitors.create') }}">
-                    <i class="material-icons">wc</i>
-                    <span>New Visitor</span>
-                </a>
-            </li>
+
             <li class="{{ request()->is('visitors*') ? 'active' : '' }}">
                 <a href="{{ route('visitors.index') }}">
                     <i class="material-icons">wc</i>
                     <span>Visitors</span>
                 </a>
             </li>
-            
+
         </ul>
     </div>
     <!-- #Menu -->
