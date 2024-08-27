@@ -19,7 +19,7 @@
         .snap-h {
             height: 240px;
             text-align: center;
-            align-items: center; 
+            align-items: center;
             padding-right: 10px;
         }
     </style>
@@ -29,7 +29,7 @@
 
 @section('content')
     <div class="min-vw-100">
-        
+
         <div class="container-fluid m-0 p-0 ">
             <div class="row g-0 py-3 align-items-center">
                 <div class="col-lg-3 col-md-3 align-middle ps-5 ">
@@ -43,11 +43,11 @@
                 </div>
             </div>
             <section class="text-lg-start">
-                
+
 
                 <div class="card">
-                    
-                    
+
+
                     <div class="row g-0">
                         <div class="col-lg-3 col-md-2 align-middle">
                             <div class="p-5 text-center">
@@ -55,13 +55,13 @@
                                     <div class="col">
                                         <span id="my_camera" class="snap"></span>
                                     </div>
-                                    
+
                                 </div>
                                 <div class="row">
                                     <div class="col">
                                         <span id="results"></span>
                                     </div>
-                                        
+
                                     </div>
                                 <div class="row text-center ">
                                     <div class="col">
@@ -80,19 +80,32 @@
                                     <input type="hidden" id="isGuest" name="is_guest" value="2" class="">
                                     <div class="row">
                                         <div class="col">
-                                            <div class="form-group mb-1">
-                                                <label class="form-label"> Visitor From <span class="text-danger font-bold">*</span></label>
-                                                <select name="visitor_type" class="form-select form-select-sm"
-                                                    id="organization-type" required>
-                                                    <option value="">Select </option>
-                                                    <option value="brand">Brand </option>
-                                                    <option value="factory">Factory </option>
-                                                    <option value="trade-union">Trade Union </option>
-                                                    <option value="official">Others </option>
-                                                </select>
-                                                <label id="organization-type-error" class="error"
-                                                    for="organization-type"></label>
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="form-group mb-1">
+                                                        <label class="form-label"> Visitor From <span class="text-danger font-bold">*</span></label>
+                                                        <select name="visitor_type" class="form-select form-select-sm"
+                                                            id="organization-type" required>
+                                                            <option value="">Select </option>
+                                                            <option value="brand">Brand </option>
+                                                            <option value="factory">Factory </option>
+                                                            <option value="trade-union">Trade Union </option>
+                                                            <option value="official">Others </option>
+                                                        </select>
+                                                        <label id="organization-type-error" class="error"
+                                                            for="organization-type"></label>
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <div class="form-group mb-3">
+                                                        <label for="visitor_card_id" class="form-label">Visitor Card ID <span
+                                                                class="text-danger font-bold">*</span></label>
+                                                        <input type="text" class="form-control form-control-sm" name="visitor_card_id"
+                                                            id="visitor_card_id" placeholder="Enter Card ID" required>
+                                                    </div>
+                                                </div>
                                             </div>
+
 
                                             <div class="form-group mb-3">
                                                 <label for="name" class="form-label">Visitor Name <span
@@ -113,11 +126,11 @@
                                                 <textarea class="form-control" name="address" placeholder="Address" id="address" style="height: 60px" required></textarea>
                                             </div>
 
-                                            
+
 
                                         </div>
                                         <div class="col">
-                                            <div class="form-group mb-1">
+                                            <div class="form-group mb-3">
                                                 <label class="form-label"> Whom to Meet <span
                                                         class="text-danger font-bold">*</span></label>
                                                 <select name="employee" id="employee"
@@ -156,7 +169,7 @@
                                                 <textarea class="form-control" placeholder="Reason" id="reason" style="height: 60px" required></textarea>
                                             </div>
 
-                                            
+
 
                                         </div>
                                     </div>
@@ -263,7 +276,7 @@
             var row = table.insertRow(rowCount);
             for (j = 0; j <= rowCount; j++) {
                 row.innerHTML = `<td class='align-top' id=` + j + 1 + '>' + j + `</td>
-                
+
                 <td class='align-top'><input type='text' name="guest_name[]" class="form-control" required /></td>
                 <td class='align-top'><input type='text' name="guest_organization[]" class="form-control"  required/></td>
                 <td class='align-top'><input type='text' name="guest_phone[]" class="form-control"  required/></td>
@@ -272,14 +285,14 @@
                 <td class='align-top' style="width: 5%">
                     <button type="button" class="btn btn-danger btn-xs delete" onclick ="delete_row($(this))">X</button>
                 </td>
-                
-                
+
+
                 `;
             }
         });
 
         function delete_row(row) {
-           
+
             row.closest('tr').remove();
             let table = document.getElementById("vtable");
             let rowCount = table.rows.length;
@@ -290,7 +303,7 @@
 
             console.log('row'+ rowCount);
             console.log('guest'+ $("#isGuest").val());
-            
+
         }
     </script>
 @endpush

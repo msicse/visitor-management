@@ -24,7 +24,7 @@ class Visitor extends Model
         "checkout",
         "in_time",
         "out_time",
-        
+
 
     ];
     public function employee(){

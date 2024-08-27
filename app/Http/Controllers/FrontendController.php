@@ -16,8 +16,8 @@ class FrontendController extends Controller
     public function index()
     {
         $employees = Employee::all();
-        // return view('frontend.visitor-new', compact('employees'));
-        return view('frontend.visitor', compact('employees'));
+        return view('frontend.visitor-new-2', compact('employees'));
+        // return view('frontend.visitor', compact('employees'));
     }
 
     public function store(Request $request)
@@ -63,7 +63,7 @@ class FrontendController extends Controller
         $data["employee_id"] = $request->employee;
         $data["in_time"] = Carbon::now();
         $data["department_id"] = $employee->department_id;
-        $data["visitor_card_id"] = $request->visitor_card;
+        $data["visitor_card_id"] = $request->visitor_card_id;
         $visitor = Visitor::create($data);
 
 
