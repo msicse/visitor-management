@@ -3,6 +3,10 @@
 @section('title', 'Admin | Dashboard')
 
 @push('css')
+
+<!-- JQuery DataTable Css -->
+<link href="{{ asset('backend/plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css') }}" rel="stylesheet">
+<link href="{{ asset('backend/js/pages/tables/buttons.dataTables.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
         integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -134,13 +138,13 @@
                                 </thead>
 
                                 <tbody>
-                                    @foreach ($today->limit(10)->get() as $key => $data)
+                                    @foreach ($today->get() as $key => $data)
                                         <tr>
                                             <td>{{ $key + 1 }}</td>
                                             <td class="text-center"> <img src="{{ asset( $data->image) }}" style="height:100px;" alt=""> </td>
                                             <td>{{ $data->visitor_card_id }}</td>
                                             <td>{{ $data->name }}</td>
-                                            <td>{{ $data->factory_name }}</td>
+                                            <td>{{ $data->organization }}</td>
                                             <td>{{ $data->phone }} </td>
                                             <td>{{ $data->in_time }} </td>
                                             <td>{{ $data->out_time }} </td>
@@ -211,6 +215,23 @@
 @endsection
 
 @push('js')
+<!-- Jquery DataTable Plugin Js -->
+<script src="{{ asset('backend/plugins/jquery-datatable/jquery.dataTables.js') }}"></script>
+<script src="{{ asset('backend/plugins/jquery-datatable/skin/bootstrap/js/dataTables.bootstrap.js') }}"></script>
+<script src="{{ asset('backend/plugins/jquery-datatable/extensions/export/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('backend/plugins/jquery-datatable/extensions/export/buttons.flash.min.js') }}"></script>
+<script src="{{ asset('backend/plugins/jquery-datatable/extensions/export/jszip.min.js') }}"></script>
+<script src="{{ asset('backend/plugins/jquery-datatable/extensions/export/pdfmake.min.js') }}"></script>
+<script src="{{ asset('backend/plugins/jquery-datatable/extensions/export/vfs_fonts.js') }}"></script>
+<script src="{{ asset('backend/plugins/jquery-datatable/extensions/export/buttons.html5.min.js') }}"></script>
+<script src="{{ asset('backend/plugins/jquery-datatable/extensions/export/buttons.print.min.js') }}"></script>
+
+<script src="{{ asset('backend/js/pages/tables/jquery-datatable.js') }}"></script>
+
+
+
+
+
     <!-- Jquery CountTo Plugin Js -->
     <script src="{{ asset('backend/plugins/jquery-countto/jquery.countTo.js') }}"></script>
 

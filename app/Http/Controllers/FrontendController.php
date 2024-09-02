@@ -73,6 +73,7 @@ class FrontendController extends Controller
 
                 $guest->visitor_id = $visitor->id;
                 $guest->name = $data['guest_name'][$i];
+                $guest->visitor_card_id = $data['guest_card_no'][$i];
                 $guest->organization = $data['guest_organization'][$i];
                 $guest->phone = $data['guest_phone'][$i];
                 $guest->email = $data['guest_email'][$i];

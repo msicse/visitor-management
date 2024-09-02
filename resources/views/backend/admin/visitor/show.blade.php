@@ -84,6 +84,7 @@
                             <thead>
                                 <tr>
                                     <th>SL</th>
+                                    <th>Card No</th>
                                     <th>Guest Name</th>
                                     <th>Organization</th>
                                     <th>Phone</th>
@@ -93,6 +94,7 @@
                                 @foreach($visitor->guests as $key => $guest)
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
+                                    <td>{{ $guest->visitor_card_id }}</td>
                                     <td>{{ $guest->name }}</td>
                                     <td>{{ $guest->organization }}</td>
                                     <td>{{ $guest->phone }}</td>

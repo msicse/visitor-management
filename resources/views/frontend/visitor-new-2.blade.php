@@ -34,7 +34,7 @@ vertical-align: top;
         <main class="w-5/6 p-4 overflow-y-auto">
             <form action="{{ route('visitor.store') }}" method="POST" id="addVisitorForm">
                 @csrf
-                <input type="hidden" name="image" class="image-tag">
+                <input type="hidden" name="image" class="image-tag" required>
                 <input type="hidden" id="isGuest" name="is_guest" value="2" class="">
                 <div class="flex gap-16">
                     <div class="w-1/2 ">
@@ -58,20 +58,6 @@ vertical-align: top;
                         </div>
 
                         <div class="flex flex-col mb-2">
-                            <label for="name" class="text-sm font-medium py-1 ">Visitor Name <span class=" text-red-600 pl-1">*</span></label>
-                            <input type="text" name="name" id="name" placeholder="Enter Name" required class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm " />
-                        </div>
-                        <div class="flex flex-col mb-2">
-                            <label for="phone" class="text-sm font-medium py-1 ">Phone <span class=" text-red-600 pl-1">*</span></label>
-                            <input type="text" name="phone" id="phone" placeholder="Enter phone" required class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm" />
-                        </div>
-                        <div class="flex flex-col mb-2">
-                            <label for="address" class="text-sm font-medium py-1 ">Address <span class=" text-red-600 pl-1">*</span></label>
-                            <textarea class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm " name="address" placeholder="Address" id="address" required></textarea>
-                        </div>
-                    </div>
-                    <div class="w-1/2">
-                        <div class="flex flex-col mb-2">
                             <label for="employee" class="text-md font-medium py-2 ">Whom to Meet <span class=" text-red-600 pl-1">*</span></label>
                             <select id="employee" name="employee" class=" rounded-sm border border-slate-950 bg-transparent py-1 px-4 text-gray-800 sm:text-sm" required>
                                 <option value="">Select RSC Employee</option>
@@ -84,19 +70,42 @@ vertical-align: top;
                             </select>
                             <label id="employee-error" class="error" for="employee"></label>
                         </div>
+
                         <div class="flex flex-col mb-2">
-                            <label for="organization" class="text-sm font-medium py-1 "> Organization <span class=" text-red-600 pl-1">*</span></label>
-                            <input id="organization" type="text" name="organization" class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm "  placeholder="Enter Organization Name" required />
-                        </div>
-                        <div class="flex flex-col mb-2">
-                            <label for="email" class="text-sm font-medium py-1 ">Email <span class=" text-red-600 pl-1" id="emailReq" >*</span></label>
-                            <input id="email" type="text" name="email" placeholder="Enter Email" class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm " />
+                            <label for="email" class="text-sm font-medium py-1 "> Email <span class=" text-red-600 pl-1" id="emailReq" >*</span></label>
+                            <input id="email" type="text" name="email" placeholder="Visitor Email" class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm " />
                         </div>
 
                         <div class="flex flex-col mb-2">
                             <label for="reason" class="text-sm font-medium py-1 ">Reason <span class=" text-red-600 pl-1">*</span></label>
                             <textarea class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm " name="reason" placeholder="Reason" id="reason" required></textarea>
                         </div>
+
+                    </div>
+                    <div class="w-1/2">
+
+
+                        <div class="flex flex-col mb-2">
+                            <label for="name" class="text-sm font-medium py-1 ">Visitor Name <span class=" text-red-600 pl-1">*</span></label>
+                            <input type="text" name="name" id="name" placeholder="Enter Name" required class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm " />
+                        </div>
+                        <div class="flex flex-col mb-2">
+                            <label for="organization" class="text-sm font-medium py-1 ">Visitor Organization <span class=" text-red-600 pl-1">*</span></label>
+                            <input id="organization" type="text" name="organization" class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm "  placeholder="Enter Organization Name" required />
+                        </div>
+
+
+                        <div class="flex flex-col mb-2">
+                            <label for="phone" class="text-sm font-medium py-1 "> Phone <span class=" text-red-600 pl-1">*</span></label>
+                            <input type="text" name="phone" id="phone" placeholder="Visitor phone" required class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm" />
+                        </div>
+
+                        <div class="flex flex-col mb-2">
+                            <label for="address" class="text-sm font-medium py-1 ">Address <span class=" text-red-600 pl-1">*</span></label>
+                            <textarea class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm " name="address" placeholder="Visitor Address" id="address" required></textarea>
+                        </div>
+
+
                     </div>
 
                 </div>
@@ -107,8 +116,9 @@ vertical-align: top;
                     <table class="w-full table-auto border" id="vtable">
                         <tr class="border border-solid border-l-0 ">
                             <th>SL</th>
+                            <th>Card No. </th>
                             <th>Name </th>
-                            <th>Organization Name </th>
+                            <th>Organization </th>
                             <th>Phone</th>
                             <th>Email</th>
                             <th>Address </th>
@@ -186,6 +196,7 @@ vertical-align: top;
             for (j = 0; j <= rowCount; j++) {
                 row.innerHTML = `<td class='' id=` + j + 1 + '>' + j + `</td>
 
+                <td class="border"><input type='text' name="guest_card_no[]" class="rounded-sm border border-slate-950 p-1 text-gray-800 text-sm" required /></td>
                 <td class="border"><input type='text' name="guest_name[]" class="rounded-sm border border-slate-950 p-1 text-gray-800 text-sm" required /></td>
                 <td class="border"><input type='text' name="guest_organization[]" class="rounded-sm border border-slate-950 p-1 text-gray-800 text-sm"  required/></td>
                 <td class="border"><input type='text' name="guest_phone[]" class="rounded-sm border border-slate-950 p-1 text-gray-800 text-sm"  required/></td>
