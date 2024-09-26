@@ -67,6 +67,12 @@
                     <span>Visitors</span>
                 </a>
             </li>
+            <li class="{{ request()->is('pending-visitors*') ? 'active' : '' }}">
+                <a href="{{ route('visitors.pending') }}">
+                    <i class="material-icons">wc</i>
+                    <span>Pending Visitors</span>
+                </a>
+            </li>
 
         </ul>
     </div>

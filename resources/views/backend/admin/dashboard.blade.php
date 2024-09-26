@@ -157,11 +157,10 @@
                                                     View
                                                 </a>
 
-
                                                 @if ($data->checkout != 1)
                                                     <button type="button" class="btn btn-danger waves-effect delete"
-                                                        data-delete-id="{{ $data->id }}" data-toggle="modal"
-                                                        title="Checkout Visitor" style="width: 100px;" data-target="#delete-modal">
+                                                        data-delete-id="{{ $data->id }}"
+                                                        title="Checkout Visitor" style="width: 100px;">
                                                         <i class="material-icons">exit_to_app</i>
                                                         Checkout
                                                     </button>
@@ -184,33 +183,6 @@
 
     </div>
 
-
-    {{-- Checkout Modal --}}
-<div class="modal fade" id="delete-modal">
-    <div class="modal-dialog">
-        <form class="delete_form" method="post">
-            @csrf
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Checkout Visitor </h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <strong>Are you sure to Checkout ?</strong>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success">Checkout</button>
-                </div>
-            </div>
-            <!-- /.modal-content -->
-        </form>
-    </div>
-    <!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
 
 @endsection
 
@@ -246,10 +218,29 @@
 
     <script>
         $( ".delete" ).click(function() {
-            var data_id=$(this).data('delete-id');
-            var url=location.origin+'/visitors/checkout/'+data_id;
-            $('.delete_form').attr('action',url);
+   let result = confirm("Press OK to Checkout");
 
+    if (result === true) {
+        var data_id=$(this).data('delete-id');
+        var url=location.origin+'/visitors/checkout/'+data_id;
+        jQuery.ajax({
+            url: url,
+            type: "post",
+            success: function(result){
+
+                if(result.status === 201){
+
+                    $('.delete[data-delete-id="' + data_id + '"]').addClass('hidden');
+                    toastr.success('Succesfully Checked Out ', 'Success')
+                } else {
+
+                    toastr.error('Server not response', 'Error');
+                }
+            },
         });
+
+    } else {
+    }
+});
     </script>
 @endpush

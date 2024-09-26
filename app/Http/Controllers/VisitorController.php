@@ -25,6 +25,15 @@ class VisitorController extends Controller
         return view("backend.admin.visitor.index", compact("visitors"));
     }
 
+
+    public function pending()
+    {
+        $visitors = VisitorResource::collection(Visitor::where('checkout', 0)->get());
+        return view("backend.admin.visitor.index", compact("visitors"));
+    }
+
+
+
     /**
      * Show the form for creating a new resource.
      */
@@ -138,7 +147,15 @@ class VisitorController extends Controller
         $visitor->out_time = Carbon::now();
         $visitor->checkout = 1;
         $visitor->save();
-        Toastr::success(' Status Updated ', 'Success');
+        // Toastr::success(' Status Updated ', 'Success');
+
+
+        return response()->json([
+            "message" => "Success",
+            "status" => 201
+        ]);
+
         return redirect()->back();
     }
+
 }

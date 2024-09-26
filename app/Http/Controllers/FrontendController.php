@@ -83,6 +83,13 @@ class FrontendController extends Controller
 
             }
         }
+
+        return response()->json([
+            "message" => "Success",
+            "status" => 201
+        ]);
+
+
         Toastr::success('Succesfully Saved ', 'Success');
         return redirect()->route('home');
     }

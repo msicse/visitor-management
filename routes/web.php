@@ -21,14 +21,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 
-     //Departments Route
-     Route::get('departments', [App\Http\Controllers\DepartmentController::class, 'index'])->name('departments.index');
-     Route::post('departments', [App\Http\Controllers\DepartmentController::class, 'store'])->name('departments.store');
-     Route::get('departments/{id}', [App\Http\Controllers\DepartmentController::class, 'edit'])->name('departments.edit');
-     Route::PUT('departments/{id}', [App\Http\Controllers\DepartmentController::class, 'update'])->name('departments.update');
-     Route::delete('departments/{id}', [App\Http\Controllers\DepartmentController::class, 'destroy'])->name('departments.destroy');
+    //Departments Route
+    Route::get('departments', [App\Http\Controllers\DepartmentController::class, 'index'])->name('departments.index');
+    Route::post('departments', [App\Http\Controllers\DepartmentController::class, 'store'])->name('departments.store');
+    Route::get('departments/{id}', [App\Http\Controllers\DepartmentController::class, 'edit'])->name('departments.edit');
+    Route::PUT('departments/{id}', [App\Http\Controllers\DepartmentController::class, 'update'])->name('departments.update');
+    Route::delete('departments/{id}', [App\Http\Controllers\DepartmentController::class, 'destroy'])->name('departments.destroy');
 
-     //Employees Route
+    //Employees Route
 
     Route::get('employees', [App\Http\Controllers\EmployeeController::class, 'index'])->name('employees.index');
     Route::get('employees/create', [App\Http\Controllers\EmployeeController::class, 'create'])->name('employees.create');
@@ -38,9 +38,12 @@ Route::middleware('auth')->group(function () {
     Route::PUT('employees/{id}', [App\Http\Controllers\EmployeeController::class, 'update'])->name('employees.update');
     Route::post('employees/status/{id}', [App\Http\Controllers\EmployeeController::class, 'updateStatus'])->name('employees.status');
     Route::delete('employees/{id}', [App\Http\Controllers\EmployeeController::class, 'destroy'])->name('employees.destroy');
-     
+
     Route::resource('visitors', VisitorController::class);
-    Route::post('visitors/checkout/{id}', [App\Http\Controllers\VisitorController::class,'checkout'])->name('visitors.checkout');
+
+    Route::get('pending-visitors', [VisitorController::class, "pending"])->name("visitors.pending");
+
+    Route::post('visitors/checkout/{id}', [App\Http\Controllers\VisitorController::class, 'checkout'])->name('visitors.checkout');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
