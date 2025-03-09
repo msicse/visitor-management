@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\Visitor;
 use App\Models\Employee;
-use Illuminate\Support\Str;
+use App\Models\Visitor;
 use App\Models\VisitorGuest;
-use Illuminate\Http\Request;
 use Brian2694\Toastr\Facades\Toastr;
+use Illuminate\Http\Request;
+use Str;
+use Carbon\Carbon;
 
 
 class FrontendController extends Controller
@@ -55,12 +55,12 @@ class FrontendController extends Controller
         }
 
 
-        $employee = Employee::find($request->employee_id);
+        $employee = Employee::find($request->employee);
         // return $data;
 
 
         $data["image"] = $file;
-        $data["employee_id"] = $request->employee_id;
+        $data["employee_id"] = $request->employee;
         $data["in_time"] = Carbon::now();
         $data["department_id"] = $employee->department_id;
         $data["visitor_card_id"] = $request->visitor_card_id;
@@ -84,10 +84,10 @@ class FrontendController extends Controller
             }
         }
 
-        // return response()->json([
-        //     "message" => "Success",
-        //     "status" => 201
-        // ]);
+        return response()->json([
+            "message" => "Success",
+            "status" => 201
+        ]);
 
 
         Toastr::success('Succesfully Saved ', 'Success');
