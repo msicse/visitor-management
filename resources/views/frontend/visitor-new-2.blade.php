@@ -32,7 +32,8 @@ vertical-align: top;
 
     </aside>
     <main class="w-5/6 p-4 overflow-y-auto">
-        <form action="#" id="addVisitorForm">
+        <form action="{{ route('visitor.store') }}" id="addVisitorForm" method="post">
+            @csrf
             <input type="hidden" name="image" id="image" class="image-tag" value="" required>
             <input type="hidden" id="isGuest" name="is_guest" value="2" class="">
             <div class="flex gap-16">
@@ -214,51 +215,51 @@ vertical-align: top;
             $("#addVisitorForm").validate();
 
 
-            console.log($(".image-tag").val());
+            // console.log($(".image-tag").val());
 
-            $("#addVisitorForm").on("submit", function (e){
-                e.preventDefault();
-
-
-                if ($("#addVisitorForm").valid()){
-                    if( $(".image-tag").val() === "" ){
-                        alert("Pleae take a Photo");
-
-                    }else{
-                        document.getElementById('spinnerModal').classList.remove('hidden');
-
-                    jQuery.ajax({
-                        url: "{{ route('visitor.store') }}",
-                        data: jQuery('#addVisitorForm').serialize(),
-                        type: "post",
-
-                        success: function(result){
-
-                            if(result.status === 201){
-
-                                $('#employee').val(null).trigger('change');
-                                jQuery('#addVisitorForm')[0].reset();
-
-                                $(".image-tag").val("");
-                                document.getElementById('results').innerHTML = "";
-                                document.getElementById('spinnerModal').classList.add('hidden');
-
-                                toastr.success('Succesfully Saved ', 'Success')
-                            } else {
-                                document.getElementById('spinnerModal').classList.add('hidden');
-                                 toastr.error('Server not response', 'Error');
-                            }
-                        },
-                    });
-                    }
-
-                } else {
-                    console.log("not valid")
-                }
+            // $("#addVisitorForm").on("submit", function (e){
+            //     e.preventDefault();
 
 
+            //     if ($("#addVisitorForm").valid()){
+            //         if( $(".image-tag").val() === "" ){
+            //             alert("Pleae take a Photo");
 
-            });
+            //         }else{
+            //             document.getElementById('spinnerModal').classList.remove('hidden');
+
+            //         jQuery.ajax({
+            //             url: "{{ route('visitor.store') }}",
+            //             data: jQuery('#addVisitorForm').serialize(),
+            //             type: "post",
+
+            //             success: function(result){
+
+            //                 if(result.status === 201){
+
+            //                     $('#employee').val(null).trigger('change');
+            //                     jQuery('#addVisitorForm')[0].reset();
+
+            //                     $(".image-tag").val("");
+            //                     document.getElementById('results').innerHTML = "";
+            //                     document.getElementById('spinnerModal').classList.add('hidden');
+
+            //                     toastr.success('Succesfully Saved ', 'Success')
+            //                 } else {
+            //                     document.getElementById('spinnerModal').classList.add('hidden');
+            //                      toastr.error('Server not response', 'Error');
+            //                 }
+            //             },
+            //         });
+            //         }
+
+            //     } else {
+            //         console.log("not valid")
+            //     }
+
+
+
+            // });
 
 
 
