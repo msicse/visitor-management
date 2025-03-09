@@ -55,12 +55,12 @@ class FrontendController extends Controller
         }
 
 
-        $employee = Employee::find($request->employee);
+        $employee = Employee::find($request->employee_id);
         // return $data;
 
 
         $data["image"] = $file;
-        $data["employee_id"] = $request->employee;
+        $data["employee_id"] = $request->employee_id;
         $data["in_time"] = Carbon::now();
         $data["department_id"] = $employee->department_id;
         $data["visitor_card_id"] = $request->visitor_card_id;
