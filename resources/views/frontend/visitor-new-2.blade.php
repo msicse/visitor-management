@@ -59,7 +59,7 @@ vertical-align: top;
 
                     <div class="flex flex-col mb-2">
                         <label for="employee" class="text-md font-medium py-2 ">Whom to Meet <span class=" text-red-600 pl-1">*</span></label>
-                        <select id="employee" name="employee" class=" rounded-sm border border-slate-950 bg-transparent py-1 px-4 text-gray-800 sm:text-sm" required>
+                        <select id="employee" name="employee_id" class=" rounded-sm border border-slate-950 bg-transparent py-1 px-4 text-gray-800 sm:text-sm" required>
                             <option value="">Select RSC Employee</option>
                             @foreach ($employees as $data)
                                 <option value="{{ $data->id }}"
