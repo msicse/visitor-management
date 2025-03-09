@@ -32,8 +32,7 @@ vertical-align: top;
 
     </aside>
     <main class="w-5/6 p-4 overflow-y-auto">
-        <form action="{{ route('visitor.store') }}" id="addVisitorForm" method="post">
-            @csrf
+        <form action="#" id="addVisitorForm">
             <input type="hidden" name="image" id="image" class="image-tag" value="" required>
             <input type="hidden" id="isGuest" name="is_guest" value="2" class="">
             <div class="flex gap-16">
@@ -59,7 +58,7 @@ vertical-align: top;
 
                     <div class="flex flex-col mb-2">
                         <label for="employee" class="text-md font-medium py-2 ">Whom to Meet <span class=" text-red-600 pl-1">*</span></label>
-                        <select id="employee" name="employee_id" class=" rounded-sm border border-slate-950 bg-transparent py-1 px-4 text-gray-800 sm:text-sm" required>
+                        <select id="employee" name="employee" class=" rounded-sm border border-slate-950 bg-transparent py-1 px-4 text-gray-800 sm:text-sm" required>
                             <option value="">Select RSC Employee</option>
                             @foreach ($employees as $data)
                                 <option value="{{ $data->id }}"
@@ -215,51 +214,51 @@ vertical-align: top;
             $("#addVisitorForm").validate();
 
 
-            // console.log($(".image-tag").val());
+            console.log($(".image-tag").val());
 
-            // $("#addVisitorForm").on("submit", function (e){
-            //     e.preventDefault();
-
-
-            //     if ($("#addVisitorForm").valid()){
-            //         if( $(".image-tag").val() === "" ){
-            //             alert("Pleae take a Photo");
-
-            //         }else{
-            //             document.getElementById('spinnerModal').classList.remove('hidden');
-
-            //         jQuery.ajax({
-            //             url: "{{ route('visitor.store') }}",
-            //             data: jQuery('#addVisitorForm').serialize(),
-            //             type: "post",
-
-            //             success: function(result){
-
-            //                 if(result.status === 201){
-
-            //                     $('#employee').val(null).trigger('change');
-            //                     jQuery('#addVisitorForm')[0].reset();
-
-            //                     $(".image-tag").val("");
-            //                     document.getElementById('results').innerHTML = "";
-            //                     document.getElementById('spinnerModal').classList.add('hidden');
-
-            //                     toastr.success('Succesfully Saved ', 'Success')
-            //                 } else {
-            //                     document.getElementById('spinnerModal').classList.add('hidden');
-            //                      toastr.error('Server not response', 'Error');
-            //                 }
-            //             },
-            //         });
-            //         }
-
-            //     } else {
-            //         console.log("not valid")
-            //     }
+            $("#addVisitorForm").on("submit", function (e){
+                e.preventDefault();
 
 
+                if ($("#addVisitorForm").valid()){
+                    if( $(".image-tag").val() === "" ){
+                        alert("Pleae take a Photo");
 
-            // });
+                    }else{
+                        document.getElementById('spinnerModal').classList.remove('hidden');
+
+                    jQuery.ajax({
+                        url: "{{ route('visitor.store') }}",
+                        data: jQuery('#addVisitorForm').serialize(),
+                        type: "post",
+
+                        success: function(result){
+
+                            if(result.status === 201){
+
+                                $('#employee').val(null).trigger('change');
+                                jQuery('#addVisitorForm')[0].reset();
+
+                                $(".image-tag").val("");
+                                document.getElementById('results').innerHTML = "";
+                                document.getElementById('spinnerModal').classList.add('hidden');
+
+                                toastr.success('Succesfully Saved ', 'Success')
+                            } else {
+                                document.getElementById('spinnerModal').classList.add('hidden');
+                                 toastr.error('Server not response', 'Error');
+                            }
+                        },
+                    });
+                    }
+
+                } else {
+                    console.log("not valid")
+                }
+
+
+
+            });
 
 
 
