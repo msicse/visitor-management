@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Employee extends Model
 {
     use HasFactory;
-
+protected $connection = 'mysql';
     public function department() : BelongsTo {
         return $this->belongsTo(Department::class);
     }

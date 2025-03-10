@@ -56,7 +56,7 @@ class FrontendController extends Controller
 
 
         $employee = Employee::find($request->employee);
-        // return $data;
+        //return $request->all();
 
 
         $data["image"] = $file;
