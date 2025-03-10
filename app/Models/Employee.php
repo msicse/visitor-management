@@ -13,7 +13,7 @@ protected $connection = 'mysql';
     public function department() : BelongsTo {
         return $this->belongsTo(Department::class);
     }
-    
+
     public function visitors()  {
         return $this->hasMany(Visitor::class);
     }
