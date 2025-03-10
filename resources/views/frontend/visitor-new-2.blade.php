@@ -227,28 +227,30 @@ vertical-align: top;
                     }else{
                         document.getElementById('spinnerModal').classList.remove('hidden');
 
-                    jQuery.ajax({
+                        $.ajax({
                         url: "{{ route('visitor.store') }}",
-                        data: jQuery('#addVisitorForm').serialize(),
-                        type: "post",
+                        data: $(this).serialize(),
+                        type: "POST",
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
 
                         success: function(result){
 
                             if(result.status === 201){
 
                                 $('#employee').val(null).trigger('change');
-                                jQuery('#addVisitorForm')[0].reset();
+                                $('#addVisitorForm')[0].reset();
 
                                 $(".image-tag").val("");
                                 document.getElementById('results').innerHTML = "";
                                 document.getElementById('spinnerModal').classList.add('hidden');
-
                                 toastr.success('Succesfully Saved ', 'Success')
                             } else {
                                 document.getElementById('spinnerModal').classList.add('hidden');
-                                 toastr.error('Server not response', 'Error');
+                                toastr.error('Server not response', 'Error');
                             }
-                        },
+                        }
                     });
                     }
 
