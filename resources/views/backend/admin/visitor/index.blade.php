@@ -70,7 +70,7 @@
                                     <td class="text-center"> <img src="{{ asset( $data->image) }}" style="height:100px;" alt=""> </td>
                                     <td>{{ $data->visitor_card_id }}</td>
                                     <td>{{ $data->name }}</td>
-                                    <td>{{ $data->factory_name }}</td>
+                                    <td>{{ $data->organization }}</td>
                                     <td>{{ $data->phone }} </td>
                                     <td>{{ date('d-m-Y h:i a', $data->in_titme) }} </td>
                                     <td>{{ $data->out_time }} </td>
