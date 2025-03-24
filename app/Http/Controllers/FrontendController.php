@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Employee;
-use App\Models\Visitor;
-use App\Models\VisitorGuest;
-use Brian2694\Toastr\Facades\Toastr;
-use Illuminate\Http\Request;
-use Str;
 use Carbon\Carbon;
+use App\Models\Visitor;
+use App\Models\Employee;
+use Illuminate\Support\Str;
+use App\Models\VisitorGuest;
+use Illuminate\Http\Request;
+use Brian2694\Toastr\Facades\Toastr;
 
 
 class FrontendController extends Controller
@@ -19,6 +19,15 @@ class FrontendController extends Controller
         //return view('frontend.visitor-new-2', compact('employees'));
          return view('frontend.visitor', compact('employees'));
     }
+
+    public function test()
+    {
+        $employees = Employee::all();
+        return view('frontend.visitor-new-2', compact('employees'));
+        //  return view('frontend.visitor', compact('employees'));
+    }
+
+
 
     public function store(Request $request)
     {
@@ -83,13 +92,12 @@ class FrontendController extends Controller
 
             }
         }
-	/*return $visitor;
+
         return response()->json([
             "message" => "Success",
             "status" => 201
         ]);
 
-	 */
         Toastr::success('Succesfully Saved ', 'Success');
         return redirect()->route('home');
     }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Employee;
 
 Route::get('/', [FrontendController::class, 'index'])->name('home');
+Route::get('/test', [FrontendController::class, 'test'])->name('visitor.test');
 Route::post('/visitor', [FrontendController::class, 'store'])->name('visitor.store');
 Route::get('camera', function () {
     return view('webcam');
