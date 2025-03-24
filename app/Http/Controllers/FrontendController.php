@@ -16,8 +16,8 @@ class FrontendController extends Controller
     public function index()
     {
         $employees = Employee::all();
-        //return view('frontend.visitor-new-2', compact('employees'));
-         return view('frontend.visitor', compact('employees'));
+        return view('frontend.visitor-new-2', compact('employees'));
+        //  return view('frontend.visitor', compact('employees'));
     }
 
     public function test()
