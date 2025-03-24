@@ -16,8 +16,8 @@ class FrontendController extends Controller
     public function index()
     {
         $employees = Employee::all();
-        return view('frontend.visitor-new-2', compact('employees'));
-        // return view('frontend.visitor', compact('employees'));
+        //return view('frontend.visitor-new-2', compact('employees'));
+         return view('frontend.visitor', compact('employees'));
     }
 
     public function store(Request $request)
@@ -83,13 +83,13 @@ class FrontendController extends Controller
 
             }
         }
-
+	/*return $visitor;
         return response()->json([
             "message" => "Success",
             "status" => 201
         ]);
 
-
+	 */
         Toastr::success('Succesfully Saved ', 'Success');
         return redirect()->route('home');
     }
