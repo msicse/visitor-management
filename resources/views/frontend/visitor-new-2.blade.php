@@ -84,7 +84,7 @@
                         </div>
 
                         <div class="flex flex-col mb-2">
-                            <label for="email" class="text-sm font-medium py-1 "> Email <span class=" text-red-600 pl-1"
+                            <label for="email" class="text-sm font-medium py-1 "> Visitor Email <span class=" text-red-600 pl-1"
                                     id="emailReq">*</span></label>
                             <input id="email" type="text" name="email" placeholder="Visitor Email"
                                 class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm " />
@@ -117,14 +117,14 @@
 
 
                         <div class="flex flex-col mb-2">
-                            <label for="phone" class="text-sm font-medium py-1 "> Phone <span
+                            <label for="phone" class="text-sm font-medium py-1 ">Visitor Phone <span
                                     class=" text-red-600 pl-1">*</span></label>
                             <input type="text" name="phone" id="phone" placeholder="Visitor phone" required
                                 class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm" />
                         </div>
 
                         <div class="flex flex-col mb-2">
-                            <label for="address" class="text-sm font-medium py-1 ">Address <span
+                            <label for="address" class="text-sm font-medium py-1 ">Visitor Address <span
                                     class=" text-red-600 pl-1">*</span></label>
                             <textarea class="rounded-sm border border-slate-950 py-1 px-4 text-gray-800 text-sm "
                                 name="address" placeholder="Visitor Address" id="address" required></textarea>
