@@ -70,10 +70,10 @@
                                     <td class="text-center"> <img src="{{ asset( $data->image) }}" style="height:100px;" alt=""> </td>
                                     <td>{{ $data->visitor_card_id }}</td>
                                     <td>{{ $data->name }}</td>
-                                    <td>{{ $data->organization }}</td>
+                                    <td>{{ $data->factory_name }}</td>
                                     <td>{{ $data->phone }} </td>
-                                    <td>{{ date('d-m-Y h:i a', $data->in_titme) }} </td>
-                                    <td>{{ $data->out_time }} </td>
+                                    <td>{{ date('d-m-Y h:i a', strtotime($data->in_time) )}} </td>
+                                    <td> {{ date('d-m-Y h:i a', strtotime($data->out_time) )}} </td>
                                     <td>{{ $data->employee->name }} </td>
 
                                     <td>
