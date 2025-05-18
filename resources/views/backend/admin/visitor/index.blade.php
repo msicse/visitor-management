@@ -43,9 +43,11 @@
                                     <th>Name</th>
                                     <th>Organization</th>
                                     <th>Phone</th>
-                                    <th>In</th>
+                                    <th>In Date</th>
+                                    <th>In Time </th>
                                     <th>Out</th>
                                     <th>To Whom</th>
+                                    <th>Reson</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -60,6 +62,7 @@
                                     <th>In</th>
                                     <th>Out</th>
                                     <th>To Whom</th>
+                                    <th>Reson</th>
                                     <th>Action</th>
                                 </tr>
                             </tfoot>
@@ -72,9 +75,11 @@
                                     <td>{{ $data->name }}</td>
                                     <td>{{ $data->factory_name }}</td>
                                     <td>{{ $data->phone }} </td>
-                                    <td>{{ date('d-m-Y h:i a', strtotime($data->in_time) )}} </td>
+                                    <td>{{ date('d-m-Y', strtotime($data->in_time) )}} </td>
+                                    <td>{{ date('h:i a', strtotime($data->in_time) )}} </td>
                                     <td> {{ date('d-m-Y h:i a', strtotime($data->out_time) )}} </td>
                                     <td>{{ $data->employee->name }} </td>
+                                    <td>{{ $data->reason }}</td>
 
                                     <td>
                                         <a href="{{ route('visitors.show', $data->id) }}" class="btn btn-info waves-effect" style="width: 100px;" title="View Visitor" >
