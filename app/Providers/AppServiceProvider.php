@@ -22,5 +22,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
+        // Register role middleware
+        $this->app['router']->aliasMiddleware('role', \App\Http\Middleware\CheckRole::class);
     }
 }

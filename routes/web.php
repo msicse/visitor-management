@@ -47,6 +47,23 @@ Route::middleware('auth')->group(function () {
     Route::get('pending-visitors', [VisitorController::class, "pending"])->name("visitors.pending");
 
     Route::post('visitors/checkout/{id}', [App\Http\Controllers\VisitorController::class, 'checkout'])->name('visitors.checkout');
+
+    // System Diagnostics Routes
+    Route::get('system/diagnostics', [App\Http\Controllers\SystemDiagnosticsController::class, 'index'])
+        ->name('system.diagnostics')
+        ->middleware('role:admin');
+    Route::post('system/diagnostics/db', [App\Http\Controllers\SystemDiagnosticsController::class, 'runDatabaseDiagnostics'])
+        ->name('system.diagnostics.db')
+        ->middleware('role:admin');
+    Route::get('system/diagnostics/permissions', [App\Http\Controllers\SystemDiagnosticsController::class, 'checkPermissions'])
+        ->name('system.diagnostics.permissions')
+        ->middleware('role:admin');
+    Route::get('system/diagnostics/errors', [App\Http\Controllers\SystemDiagnosticsController::class, 'getRecentErrors'])
+        ->name('system.diagnostics.errors')
+        ->middleware('role:admin');
+    Route::post('system/diagnostics/fix-permissions', [App\Http\Controllers\SystemDiagnosticsController::class, 'fixPermissions'])
+        ->name('system.diagnostics.fixPermissions')
+        ->middleware('role:admin');
 });
 
 require __DIR__ . '/auth.php';
