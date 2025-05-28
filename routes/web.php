@@ -10,6 +10,8 @@ use App\Models\Employee;
 Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('/test', [FrontendController::class, 'test'])->name('visitor.test');
 Route::post('/visitor', [FrontendController::class, 'store'])->name('visitor.store');
+Route::post('/get-visitor-by-phone', [FrontendController::class, 'getVisitorByPhone'])->name('visitor.getByPhone');
+Route::post('/check-card-id', [FrontendController::class, 'checkCardId'])->name('visitor.checkCardId');
 Route::get('camera', function () {
     return view('webcam');
 });
