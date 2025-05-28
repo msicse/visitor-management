@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('visitor_guests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('visitor_id')->constrained('visitors');
+            $table->unsignedBigInteger('visitor_id');
             $table->string('name');
             $table->string('organization');
             $table->string('phone');
@@ -27,6 +27,12 @@ return new class extends Migration
             $table->timestamp('in_time')->nullable();
             $table->timestamp('out_time')->nullable();
             $table->timestamps();
+
+            // Explicitly define foreign key with onDelete cascade
+            $table->foreign('visitor_id')
+                  ->references('id')
+                  ->on('visitors')
+                  ->onDelete('cascade');
         });
     }
 

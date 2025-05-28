@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('department_id')->constrained('departments');
+            $table->unsignedBigInteger('department_id');
             $table->string('emply_id');
             $table->string('name');
             $table->string('designation');
@@ -28,6 +28,12 @@ return new class extends Migration
             $table->tinyInteger('status');
             $table->text('about')->nullable();
             $table->timestamps();
+
+            // Explicitly define foreign key with onDelete cascade
+            $table->foreign('department_id')
+                  ->references('id')
+                  ->on('departments')
+                  ->onDelete('cascade');
         });
     }
 

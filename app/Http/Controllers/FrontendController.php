@@ -8,8 +8,8 @@ use App\Models\Employee;
 use Illuminate\Support\Str;
 use App\Models\VisitorGuest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Brian2694\Toastr\Facades\Toastr;
 
 
@@ -55,7 +55,7 @@ class FrontendController extends Controller
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
-            \Log::error('Error in getVisitorByPhone: ' . $e->getMessage());
+            Log::error('Error in getVisitorByPhone: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while fetching visitor data'
@@ -171,11 +171,19 @@ class FrontendController extends Controller
                 $file = 'no-image.png';
             }
 
+
+
             $employee = Employee::find($request->employee);
-            //return $request->all();
+
+            // Double check if employee exists to prevent foreign key issues
+            if (!$employee) {
+                return redirect()->back()->withErrors([
+                    'employee' => 'The selected employee does not exist in the database. Please select a valid employee.'
+                ])->withInput();
+            }
 
             // Begin transaction
-            \DB::beginTransaction();
+            DB::beginTransaction();
             try {
                 $data["image"] = $file;
                 $data["employee_id"] = $request->employee;
@@ -226,8 +234,8 @@ class FrontendController extends Controller
                     }
                 }
 
-                // Commit transaction if everything is successful
-                \DB::commit();
+                // Commt transaction if everything is successful
+                DB::commit();
 
                 if ($request->expectsJson()) {
                     return response()->json([
@@ -240,7 +248,7 @@ class FrontendController extends Controller
                 }
             } catch (\Exception $e) {
                 // Roll back transaction on any error
-                \DB::rollBack();
+                DB::rollBack();
                 throw $e; // Re-throw the exception to be caught by the outer try-catch block
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -299,6 +307,23 @@ class FrontendController extends Controller
                 // Unknown column
                 $errorMessage = 'Database structure issue. Please contact administrator.';
                 Log::critical('Unknown column error: ' . $e->getMessage());
+            } else if ($errorCode == 1452) {
+                // Foreign key constraint fails
+                $errorMessage = 'The selected employee does not exist. Please select a valid employee.';
+
+                // Check if the message specifically mentions 'employee_id'
+                if (strpos($driverErrorMessage, 'employee_id') !== false) {
+                    $errorMessage = 'The selected employee does not exist. Please select a valid employee.';
+                } else if (strpos($driverErrorMessage, 'department_id') !== false) {
+                    $errorMessage = 'The selected department does not exist. Please contact administrator.';
+                } else {
+                    $errorMessage = 'A reference error occurred. Please verify your selection and try again.';
+                }
+
+                Log::critical('Foreign key constraint error: ' . $e->getMessage(), [
+                    'driver_message' => $driverErrorMessage,
+                    'table' => 'visitors'
+                ]);
             } else if ($errorCode == 1040) {
                 // Too many connections
                 $errorMessage = 'Database is busy. Please try again later.';
@@ -426,7 +451,7 @@ class FrontendController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('Error in checkCardId: ' . $e->getMessage());
+            Log::error('Error in checkCardId: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'available' => false,

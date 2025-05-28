@@ -332,6 +332,25 @@
             $('#employee').select2();
             $("#addVisitorForm").validate();
 
+            // Check if employee selection has valid options
+            if ($('#employee option').length <= 1) {
+                // Only the default "Select" option exists
+                toastr.warning('No employees found in the system. Please contact administrator.', 'Warning');
+            }
+
+            // Add custom validation for employee field
+            $('#employee').on('change', function() {
+                const employeeId = $(this).val();
+                if (employeeId) {
+                    // Verify the selected employee exists in the database
+                    const optionExists = $('#employee option[value="' + employeeId + '"]').length > 0;
+                    if (!optionExists) {
+                        toastr.error('The selected employee does not exist. Please select a valid employee.', 'Error');
+                        $(this).val('');
+                    }
+                }
+            });
+
             // Function to clear visitor form fields
             function clearVisitorFormFields() {
                 $('#name').val('');
@@ -459,6 +478,26 @@
                 $('.form-error').remove();
                 $('.error-border').removeClass('error-border');
 
+                // Specifically check employee field
+                const employeeId = $('#employee').val();
+                if (!employeeId) {
+                    $('#employee').addClass('border-red-500 error-border');
+                    $('<div class="text-red-500 text-xs mt-1 form-error">Please select an employee to meet</div>')
+                        .insertAfter($('#employee-error'));
+                    toastr.error('Please select an employee to meet', 'Validation Error');
+                    return;
+                }
+
+                // Verify the selected employee exists in the database
+                const optionExists = $('#employee option[value="' + employeeId + '"]').length > 0;
+                if (!optionExists) {
+                    $('#employee').addClass('border-red-500 error-border');
+                    $('<div class="text-red-500 text-xs mt-1 form-error">The selected employee does not exist. Please select a valid employee.</div>')
+                        .insertAfter($('#employee-error'));
+                    toastr.error('The selected employee does not exist', 'Validation Error');
+                    return;
+                }
+
                 // Check if there are any duplicate guest card IDs
                 let hasDuplicateGuests = false;
                 let guestCardIds = [];
@@ -559,6 +598,21 @@
 
                                     if (xhr.responseJSON && xhr.responseJSON.error) {
                                         errorMessage = xhr.responseJSON.error;
+
+                                        // Check for common foreign key constraint messages
+                                        if (errorMessage.includes('employee does not exist') ||
+                                            errorMessage.includes('reference error') ||
+                                            errorMessage.includes('foreign key constraint')) {
+
+                                            // Reset the employee dropdown
+                                            $('#employee').val('').trigger('change');
+                                            $('#employee').addClass('border-red-500 error-border');
+
+                                            // Reload employee list to ensure it's up to date
+                                            setTimeout(function() {
+                                                location.reload();
+                                            }, 3000);
+                                        }
                                     }
 
                                     toastr.error(errorMessage, 'Server Error');
