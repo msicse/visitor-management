@@ -20,12 +20,7 @@ class FrontendController extends Controller
         //  return view('frontend.visitor', compact('employees'));
     }
 
-    public function test()
-    {
-        $employees = Employee::all();
-        return view('frontend.visitor-new-2', compact('employees'));
-        //  return view('frontend.visitor', compact('employees'));
-    }
+    // test() method removed as it's a duplicate of index()
 
 
 
@@ -43,6 +38,20 @@ class FrontendController extends Controller
         //     'email' => '',
         //     'image' => '',
         // ]);
+
+        // Implementing proper validation
+        $request->validate([
+            'employee' => 'required|integer|exists:employees,id',
+            'name' => 'required|max:255',
+            'visitor_type' => 'required|max:255',
+            'organization' => 'required|max:255',
+            'phone' => 'required',
+            'address' => 'required',
+            'visitor_card_id' => 'required',
+            'email' => 'nullable|email',
+            'image' => 'nullable',
+            'reason' => 'required',
+        ]);
 
         $data = $request->all();
         $slug = Str::slug($request->name);
@@ -93,12 +102,14 @@ class FrontendController extends Controller
             }
         }
 
-        return response()->json([
-            "message" => "Success",
-            "status" => 201
-        ]);
-
-        Toastr::success('Succesfully Saved ', 'Success');
-        return redirect()->route('home');
+        if ($request->expectsJson()) {
+            return response()->json([
+                "message" => "Success",
+                "status" => 201
+            ]);
+        } else {
+            Toastr::success('Successfully Saved', 'Success');
+            return redirect()->route('home');
+        }
     }
 }

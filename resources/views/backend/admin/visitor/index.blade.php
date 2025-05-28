@@ -77,7 +77,7 @@
                                     <td>{{ $data->phone }} </td>
                                     <td>{{ date('d-m-Y', strtotime($data->in_time) )}} </td>
                                     <td>{{ date('h:i a', strtotime($data->in_time) )}} </td>
-                                    <td> {{ date('d-m-Y h:i a', strtotime($data->out_time) )}} </td>
+                                    <td> {!! $data->out_time ? date('d-m-Y h:i a', strtotime($data->out_time)) : "<span class='text-danger'>Pending Checkout</span>" !!} </td>
                                     <td>{{ $data->employee->name }} </td>
                                     <td>{{ $data->reason }}</td>
 
