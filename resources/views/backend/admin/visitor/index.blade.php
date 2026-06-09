@@ -6,6 +6,8 @@
     <!-- JQuery DataTable Css -->
     <link href="{{ asset('backend/plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/js/pages/tables/buttons.dataTables.min.css') }}" rel="stylesheet">
+    <!-- Bootstrap Select -->
+    <link href="{{ asset('backend/select2/select2.min.css') }}" rel="stylesheet">
     <style>
         .table td{
             vertical-align: middle !important;
@@ -27,26 +29,25 @@
         <div class="col-lg-12">
             <div class="card filter-card">
                 <div class="body">
-                    <form method="GET" action="{{ route('visitors.index') }}">
-                        <div class="row">
+                    <div class="row">
                             <div class="col-md-2 col-sm-6">
                                 <div class="form-group">
                                     <label>Date From</label>
-                                    <input type="date" name="date_from" class="form-control"
+                                    <input type="date" id="date_from" name="date_from" class="form-control"
                                         value="{{ request('date_from') }}">
                                 </div>
                             </div>
                             <div class="col-md-2 col-sm-6">
                                 <div class="form-group">
                                     <label>Date To</label>
-                                    <input type="date" name="date_to" class="form-control"
+                                    <input type="date" id="date_to" name="date_to" class="form-control"
                                         value="{{ request('date_to') }}">
                                 </div>
                             </div>
                             <div class="col-md-2 col-sm-6">
                                 <div class="form-group">
                                     <label>Status</label>
-                                    <select name="status" class="form-control">
+                                    <select name="status" id="filter_status" class="form-control">
                                         <option value="">All Status</option>
                                         <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Pending Checkout</option>
                                         <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Checked Out</option>
@@ -56,7 +57,7 @@
                             <div class="col-md-2 col-sm-6">
                                 <div class="form-group">
                                     <label>Visitor Type</label>
-                                    <select name="visitor_type" class="form-control">
+                                    <select name="visitor_type" id="filter_visitor_type" class="form-control">
                                         <option value="">All Types</option>
                                         @foreach($visitorTypes as $type)
                                             <option value="{{ $type }}" {{ request('visitor_type') == $type ? 'selected' : '' }}>
@@ -69,7 +70,7 @@
                             <div class="col-md-2 col-sm-6">
                                 <div class="form-group">
                                     <label>Department</label>
-                                    <select name="department_id" class="form-control">
+                                    <select name="department_id" id="filter_department" class="form-control">
                                         <option value="">All Departments</option>
                                         @foreach($departments as $dept)
                                             <option value="{{ $dept->id }}" {{ request('department_id') == $dept->id ? 'selected' : '' }}>
@@ -82,7 +83,7 @@
                             <div class="col-md-2 col-sm-6">
                                 <div class="form-group">
                                     <label>Employee (Host)</label>
-                                    <select name="employee_id" class="form-control">
+                                    <select name="employee_id" id="filter_employee" class="form-control">
                                         <option value="">All Employees</option>
                                         @foreach($employees as $emp)
                                             <option value="{{ $emp->id }}" {{ request('employee_id') == $emp->id ? 'selected' : '' }}>
@@ -96,15 +97,14 @@
                         </div>
                         <div class="row" style="margin-top:10px;">
                             <div class="col-md-12">
-                                <button type="submit" class="btn btn-primary waves-effect">
+                                <button type="button" id="applyFilter" class="btn btn-primary waves-effect">
                                     <i class="material-icons">filter_list</i> Filter
                                 </button>
-                                <a href="{{ route('visitors.index') }}" class="btn btn-default waves-effect">
+                                <button type="button" id="resetFilter" class="btn btn-default waves-effect">
                                     <i class="material-icons">clear</i> Reset
-                                </a>
+                                </button>
                             </div>
                         </div>
-                    </form>
                 </div>
             </div>
         </div>
@@ -116,13 +116,11 @@
                 <div class="header">
                     <h2>
                         All Visitors
-                        <span class="badge ">{{ $visitors->count() }}</span>
-
                     </h2>
                 </div>
                 <div class="body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-hover dataTable js-exportable">
+                        <table id="visitorsTable" class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>SL</th>
@@ -155,43 +153,8 @@
                                 </tr>
                             </tfoot>
                             <tbody>
-                                @foreach( $visitors as $key => $data)
-                                <tr>
-                                    <td>{{ $key + 1 }}</td>
-                                    <td class="text-center"> <img src="{{ asset( $data->image) }}" style="height:100px;" alt=""> </td>
-                                    <td>{{ $data->visitor_card_id }}</td>
-                                    <td>{{ $data->name }}</td>
-                                    <td>{{ $data->organization }}</td>
-                                    <td>{{ $data->phone }} </td>
-                                    <td>{{ date('d-m-Y', strtotime($data->in_time) )}} </td>
-                                    <td>{{ date('h:i a', strtotime($data->in_time) )}} </td>
-                                    <td> {!! $data->out_time ? date('d-m-Y h:i a', strtotime($data->out_time)) : "<span class='text-danger'>Pending Checkout</span>" !!} </td>
-                                    <td>{{ $data->employee->name }} </td>
-                                    <td>{{ $data->reason }}</td>
-
-                                    <td>
-                                        <a href="{{ route('visitors.show', $data->id) }}" class="btn btn-info waves-effect" style="width: 100px;" title="View Visitor" >
-                                            <i class="material-icons">visibility</i>
-                                            View
-                                        </a>
-
-
-                                        @if($data->checkout != 1)
-                                        <button type="button" class="btn btn-danger waves-effect delete" data-delete-id="{{$data->id}}" style="width: 100px;"  title="Checkedout Visitor" >
-                                            <i class="material-icons">exit_to_app</i>
-                                            Checkout
-                                        </button>
-                                        @endif
-
-
-                                    </td>
-                                </tr>
-                                @endforeach
                             </tbody>
                         </table>
-                    </div>
-                    <div class="mt-3">
-                        {{ $visitors->links() }}
                     </div>
                 </div>
             </div>
@@ -220,36 +183,85 @@
 
 
     <script src="{{ asset('backend/js/pages/tables/jquery-datatable.js') }}"></script>
+    <script src="{{ asset('backend/select2/select2.min.js') }}"></script>
+    <script>
+        $(document).ready(function () {
 
-<script>
+            // Select2 for filter dropdowns
+            $('#filter_status, #filter_visitor_type, #filter_department, #filter_employee').select2({
+                width: '100%',
+                allowClear: true
+            });
 
-$( ".delete" ).click(function() {
-   let result = confirm("Press OK to Checkout");
+            // Server-side DataTable
+            var table = $('#visitorsTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '{{ route('visitors.data') }}',
+                    type: 'GET',
+                    data: function (d) {
+                        d.date_from     = $('#date_from').val();
+                        d.date_to       = $('#date_to').val();
+                        d.status        = $('#filter_status').val();
+                        d.visitor_type  = $('#filter_visitor_type').val();
+                        d.department_id = $('#filter_department').val();
+                        d.employee_id   = $('#filter_employee').val();
+                    }
+                },
+                columns: [
+                    { title: 'SL',           orderable: false },
+                    { title: 'Image',        orderable: false },
+                    { title: 'Visitor Card' },
+                    { title: 'Name' },
+                    { title: 'Organization' },
+                    { title: 'Phone',        orderable: false },
+                    { title: 'In Date' },
+                    { title: 'In Time' },
+                    { title: 'Out' },
+                    { title: 'To Whom',      orderable: false },
+                    { title: 'Reason' },
+                    { title: 'Action',       orderable: false, searchable: false },
+                ],
+                order: [[6, 'desc']],
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100, 200],
+            });
 
-    if (result === true) {
-        var data_id=$(this).data('delete-id');
-        var url=location.origin+'/visitors/checkout/'+data_id;
-        jQuery.ajax({
-            url: url,
-            type: "post",
-            success: function(result){
+            // Filter button
+            $('#applyFilter').on('click', function () {
+                table.ajax.reload();
+            });
 
-                if(result.status === 201){
+            // Reset button
+            $('#resetFilter').on('click', function () {
+                $('#date_from, #date_to').val('');
+                $('#filter_status, #filter_visitor_type, #filter_department, #filter_employee').val(null).trigger('change');
+                table.ajax.reload();
+            });
 
-                    $('.delete[data-delete-id="' + data_id + '"]').addClass('hidden');
-                    toastr.success('Succesfully Checked Out ', 'Success')
-                } else {
-
-                    toastr.error('Server not response', 'Error');
-                }
-            },
+            // Checkout button (delegated - works on dynamically loaded rows)
+            $(document).on('click', '.delete', function () {
+                if (!confirm('Press OK to Checkout')) return;
+                var data_id = $(this).data('delete-id');
+                var url = location.origin + '/visitors/checkout/' + data_id;
+                var $btn = $(this);
+                jQuery.ajax({
+                    url: url,
+                    type: 'post',
+                    success: function (result) {
+                        if (result.status === 201) {
+                            $btn.remove();
+                            toastr.success('Successfully Checked Out', 'Success');
+                            table.ajax.reload(null, false);
+                        } else {
+                            toastr.error('Server not response', 'Error');
+                        }
+                    },
+                });
+            });
         });
-
-    } else {
-    }
-});
-
-</script>
+    </script>
 
 
 @endpush

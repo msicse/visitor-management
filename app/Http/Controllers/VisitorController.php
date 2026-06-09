@@ -21,8 +21,18 @@ class VisitorController extends Controller
      */
     public function index(Request $request)
     {
+        $departments  = Department::orderBy('name')->get();
+        $employees    = Employee::where('status', 1)->orderBy('name')->get();
+        $visitorTypes = Visitor::select('visitor_type')->distinct()->pluck('visitor_type');
+
+        return view("backend.admin.visitor.index", compact("departments", "employees", "visitorTypes"));
+    }
+
+    public function getData(Request $request)
+    {
         $query = Visitor::with('employee');
 
+        // Custom filters passed from the filter form via DataTables ajax.data
         if ($request->filled('date_from')) {
             $query->whereDate('in_time', '>=', $request->date_from);
         }
@@ -41,32 +51,84 @@ class VisitorController extends Controller
         if ($request->filled('employee_id')) {
             $query->where('employee_id', $request->employee_id);
         }
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('organization', 'like', "%{$search}%");
+
+        $totalData     = Visitor::count();
+        $totalFiltered = $query->count();
+
+        // DataTables global search box
+        $searchValue = $request->input('search.value');
+        if (!empty($searchValue)) {
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('name', 'like', "%{$searchValue}%")
+                  ->orWhere('phone', 'like', "%{$searchValue}%")
+                  ->orWhere('organization', 'like', "%{$searchValue}%")
+                  ->orWhere('visitor_card_id', 'like', "%{$searchValue}%");
             });
+            $totalFiltered = $query->count();
         }
 
-        $visitors    = $query->latest()->paginate(100)->withQueryString();
-        $departments = Department::orderBy('name')->get();
-        $employees   = Employee::where('status', 1)->orderBy('name')->get();
-        $visitorTypes = Visitor::select('visitor_type')->distinct()->pluck('visitor_type');
+        // Column ordering
+        $columnMap = [
+            2 => 'visitor_card_id',
+            3 => 'name',
+            4 => 'organization',
+            5 => 'phone',
+            6 => 'in_time',
+            7 => 'in_time',
+            8 => 'out_time',
+            10 => 'reason',
+        ];
+        $orderColIdx = (int) $request->input('order.0.column', 6);
+        $orderDir    = $request->input('order.0.dir', 'desc') === 'asc' ? 'asc' : 'desc';
+        $orderCol    = $columnMap[$orderColIdx] ?? 'in_time';
+        $query->orderBy($orderCol, $orderDir);
 
-        return view("backend.admin.visitor.index", compact("visitors", "departments", "employees", "visitorTypes"));
+        $start   = (int) $request->input('start', 0);
+        $length  = (int) $request->input('length', 25);
+        $records = $query->skip($start)->take($length)->get();
+
+        $data = [];
+        foreach ($records as $i => $v) {
+            $image = $v->image
+                ? '<img src="' . asset($v->image) . '" style="height:60px;">'
+                : '';
+            $actions = '<a href="' . route('visitors.show', $v->id) . '" class="btn btn-info waves-effect btn-sm" title="View"><i class="material-icons">visibility</i> View</a>';
+            if (!$v->checkout) {
+                $actions .= ' <button type="button" class="btn btn-danger waves-effect btn-sm delete" data-delete-id="' . $v->id . '" title="Checkout"><i class="material-icons">exit_to_app</i> Checkout</button>';
+            }
+            $data[] = [
+                $start + $i + 1,
+                $image,
+                e($v->visitor_card_id ?? ''),
+                e($v->name),
+                e($v->organization),
+                e($v->phone ?? ''),
+                $v->in_time ? date('d-m-Y', strtotime($v->in_time)) : '',
+                $v->in_time ? date('h:i a', strtotime($v->in_time)) : '',
+                $v->out_time
+                    ? date('d-m-Y h:i a', strtotime($v->out_time))
+                    : "<span class='text-danger'>Pending Checkout</span>",
+                $v->employee ? e($v->employee->name) : '',
+                e($v->reason ?? ''),
+                $actions,
+            ];
+        }
+
+        return response()->json([
+            'draw'            => intval($request->input('draw')),
+            'recordsTotal'    => $totalData,
+            'recordsFiltered' => $totalFiltered,
+            'data'            => $data,
+        ]);
     }
-
 
     public function pending(Request $request)
     {
-        $visitors    = Visitor::with('employee')->where('checkout', 0)->latest()->paginate(100)->withQueryString();
-        $departments = Department::orderBy('name')->get();
-        $employees   = Employee::where('status', 1)->orderBy('name')->get();
+        $departments  = Department::orderBy('name')->get();
+        $employees    = Employee::where('status', 1)->orderBy('name')->get();
         $visitorTypes = Visitor::select('visitor_type')->distinct()->pluck('visitor_type');
 
-        return view("backend.admin.visitor.index", compact("visitors", "departments", "employees", "visitorTypes"));
+        return view("backend.admin.visitor.index", compact("departments", "employees", "visitorTypes"));
     }
 
 

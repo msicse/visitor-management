@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::post('employees/status/{id}', [App\Http\Controllers\EmployeeController::class, 'updateStatus'])->name('employees.status');
     Route::delete('employees/{id}', [App\Http\Controllers\EmployeeController::class, 'destroy'])->name('employees.destroy');
 
+    Route::get('visitors/data', [VisitorController::class, 'getData'])->name('visitors.data');
     Route::resource('visitors', VisitorController::class);
 
     Route::get('pending-visitors', [VisitorController::class, "pending"])->name("visitors.pending");
