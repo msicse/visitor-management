@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Visitor;
 use Illuminate\Http\Request;
@@ -10,7 +11,6 @@ use Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Brian2694\Toastr\Facades\Toastr;
-use App\Http\Resources\VisitorResource;
 use Storage;
 
 
@@ -19,17 +19,54 @@ class VisitorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $visitors = VisitorResource::collection(Visitor::all());
-        return view("backend.admin.visitor.index", compact("visitors"));
+        $query = Visitor::with('employee');
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('in_time', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('in_time', '<=', $request->date_to);
+        }
+        if ($request->filled('status') && $request->status !== '') {
+            $query->where('checkout', $request->status);
+        }
+        if ($request->filled('visitor_type')) {
+            $query->where('visitor_type', $request->visitor_type);
+        }
+        if ($request->filled('department_id')) {
+            $query->where('department_id', $request->department_id);
+        }
+        if ($request->filled('employee_id')) {
+            $query->where('employee_id', $request->employee_id);
+        }
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('organization', 'like', "%{$search}%");
+            });
+        }
+
+        $visitors    = $query->latest()->paginate(100)->withQueryString();
+        $departments = Department::orderBy('name')->get();
+        $employees   = Employee::where('status', 1)->orderBy('name')->get();
+        $visitorTypes = Visitor::select('visitor_type')->distinct()->pluck('visitor_type');
+
+        return view("backend.admin.visitor.index", compact("visitors", "departments", "employees", "visitorTypes"));
     }
 
 
-    public function pending()
+    public function pending(Request $request)
     {
-        $visitors = VisitorResource::collection(Visitor::where('checkout', 0)->get());
-        return view("backend.admin.visitor.index", compact("visitors"));
+        $visitors    = Visitor::with('employee')->where('checkout', 0)->latest()->paginate(100)->withQueryString();
+        $departments = Department::orderBy('name')->get();
+        $employees   = Employee::where('status', 1)->orderBy('name')->get();
+        $visitorTypes = Visitor::select('visitor_type')->distinct()->pluck('visitor_type');
+
+        return view("backend.admin.visitor.index", compact("visitors", "departments", "employees", "visitorTypes"));
     }
 
 

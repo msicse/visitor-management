@@ -10,6 +10,7 @@
         .table td{
             vertical-align: middle !important;
         }
+        .filter-card .form-group { margin-bottom: 0; }
     </style>
 @endpush
 @section('content')
@@ -20,6 +21,93 @@
             <span>Add New Visitor</span>
         </a>
 
+    </div>
+    <!-- Filter Card -->
+    <div class="row clearfix">
+        <div class="col-lg-12">
+            <div class="card filter-card">
+                <div class="body">
+                    <form method="GET" action="{{ route('visitors.index') }}">
+                        <div class="row">
+                            <div class="col-md-2 col-sm-6">
+                                <div class="form-group">
+                                    <label>Date From</label>
+                                    <input type="date" name="date_from" class="form-control"
+                                        value="{{ request('date_from') }}">
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-6">
+                                <div class="form-group">
+                                    <label>Date To</label>
+                                    <input type="date" name="date_to" class="form-control"
+                                        value="{{ request('date_to') }}">
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-6">
+                                <div class="form-group">
+                                    <label>Status</label>
+                                    <select name="status" class="form-control">
+                                        <option value="">All Status</option>
+                                        <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Pending Checkout</option>
+                                        <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Checked Out</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-6">
+                                <div class="form-group">
+                                    <label>Visitor Type</label>
+                                    <select name="visitor_type" class="form-control">
+                                        <option value="">All Types</option>
+                                        @foreach($visitorTypes as $type)
+                                            <option value="{{ $type }}" {{ request('visitor_type') == $type ? 'selected' : '' }}>
+                                                {{ $type }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-6">
+                                <div class="form-group">
+                                    <label>Department</label>
+                                    <select name="department_id" class="form-control">
+                                        <option value="">All Departments</option>
+                                        @foreach($departments as $dept)
+                                            <option value="{{ $dept->id }}" {{ request('department_id') == $dept->id ? 'selected' : '' }}>
+                                                {{ $dept->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-6">
+                                <div class="form-group">
+                                    <label>Employee (Host)</label>
+                                    <select name="employee_id" class="form-control">
+                                        <option value="">All Employees</option>
+                                        @foreach($employees as $emp)
+                                            <option value="{{ $emp->id }}" {{ request('employee_id') == $emp->id ? 'selected' : '' }}>
+                                                {{ $emp->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row" style="margin-top:10px;">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-primary waves-effect">
+                                    <i class="material-icons">filter_list</i> Filter
+                                </button>
+                                <a href="{{ route('visitors.index') }}" class="btn btn-default waves-effect">
+                                    <i class="material-icons">clear</i> Reset
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- Exportable Table -->
     <div class="row clearfix">
@@ -101,6 +189,9 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+                    <div class="mt-3">
+                        {{ $visitors->links() }}
                     </div>
                 </div>
             </div>
