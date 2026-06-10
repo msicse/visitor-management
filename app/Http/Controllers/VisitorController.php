@@ -124,11 +124,10 @@ class VisitorController extends Controller
 
     public function pending(Request $request)
     {
-        $departments  = Department::orderBy('name')->get();
-        $employees    = Employee::where('status', 1)->orderBy('name')->get();
-        $visitorTypes = Visitor::select('visitor_type')->distinct()->pluck('visitor_type');
+        $departments = Department::orderBy('name')->get();
+        $employees   = Employee::where('status', 1)->orderBy('name')->get();
 
-        return view("backend.admin.visitor.index", compact("departments", "employees", "visitorTypes"));
+        return view("backend.admin.visitor.pending", compact("departments", "employees"));
     }
 
 
