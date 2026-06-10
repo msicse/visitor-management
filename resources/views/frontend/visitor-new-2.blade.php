@@ -330,7 +330,7 @@
 
         $(document).ready(function () {
             $('#employee').select2();
-            $("#addVisitorForm").validate();
+            $("#addVisitorForm").validate({ onsubmit: false });
 
             // Check if employee selection has valid options
             if ($('#employee option').length <= 1) {
@@ -367,6 +367,16 @@
             $('#visitor_card_id').on('input', function() {
                 const cardId = $(this).val().trim();
                 clearTimeout(cardIdTimer);
+
+                // Always clear any form-error divs and the jQuery Validate label near this field on every keystroke
+                $(this).nextAll('.form-error').remove();
+                $(this).removeClass('border-red-500 error-border');
+                $('#visitor_card_id-error').text('');
+
+                if (cardId.length === 0) {
+                    $('#cardIdFeedback').addClass('hidden').removeClass('text-green-600 text-red-600').text('');
+                    return;
+                }
 
                 if (cardId.length > 0) {
                     // Clear previous feedback
@@ -407,16 +417,6 @@
                     spinnerModal.classList.remove('hidden');
                     spinnerModal.classList.add('flex');
 
-                    // Clear form fields before making the request
-                    clearVisitorFormFields();
-
-                    // Reset the camera/photo
-                    $(".image-tag").val("");
-                    document.getElementById('results').innerHTML = "";
-                    $("#my_camera").css("visibility", "visible");
-                    $("#results").css("visibility", "hidden");
-                    $("input[onClick='retake_photo()']").val("Take Photo").attr("onClick", "take_snapshot()");
-
                     $.ajax({
                         url: "{{ route('visitor.getByPhone') }}",
                         data: { phone: phoneNumber },
@@ -432,21 +432,15 @@
                             if (response.status === 'success') {
                                 const visitor = response.data;
 
-                                // Populate form fields with visitor data
-                                $('#name').val(visitor.name);
-                                $('#email').val(visitor.email);
-                                $('#organization').val(visitor.organization);
-                                $('#address').val(visitor.address);
-
-                                // Set visitor type dropdown
-                                $('#organization-type').val(visitor.visitor_type);
+                                // Only populate fields that are currently empty
+                                if (!$('#name').val()) $('#name').val(visitor.name);
+                                if (!$('#email').val()) $('#email').val(visitor.email);
+                                if (!$('#organization').val()) $('#organization').val(visitor.organization);
+                                if (!$('#address').val()) $('#address').val(visitor.address);
+                                if (!$('#organization-type').val()) $('#organization-type').val(visitor.visitor_type);
 
                                 // Notify user
                                 toastr.info('Previous visitor data loaded. You can modify if needed.', 'Info');
-                            } else {
-                                // If no visitor found, form fields remain cleared
-                                // Optional: notify user that this is a new visitor
-                                // toastr.info('New visitor registration', 'Info');
                             }
                         },
                         error: function(xhr, status, errorThrown) {
@@ -477,6 +471,7 @@
                 // Reset previous error highlights
                 $('.form-error').remove();
                 $('.error-border').removeClass('error-border');
+                $('#cardIdFeedback').addClass('hidden').removeClass('text-green-600 text-red-600').text('');
 
                 // Specifically check employee field
                 const employeeId = $('#employee').val();
@@ -588,8 +583,14 @@
                                         const inputField = $('#' + field);
                                         if (inputField.length) {
                                             inputField.addClass('border-red-500 error-border');
-                                            $('<div class="text-red-500 text-xs mt-1 form-error">' + errors[field][0] + '</div>')
-                                                .insertAfter(inputField);
+                                            // For visitor_card_id, insert before #cardIdFeedback so only one message shows
+                                            if (field === 'visitor_card_id') {
+                                                $('<div class="text-red-500 text-xs mt-1 form-error">' + errors[field][0] + '</div>')
+                                                    .insertBefore($('#cardIdFeedback'));
+                                            } else {
+                                                $('<div class="text-red-500 text-xs mt-1 form-error">' + errors[field][0] + '</div>')
+                                                    .insertAfter(inputField);
+                                            }
                                         }
                                     }
                                 } else if (xhr.status === 500) {

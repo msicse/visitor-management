@@ -14,7 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
             'visitor',
-            'visitors/checkout/*'
+            'visitors/checkout/*',
+            'check-card-id',
+            'get-visitor-by-phone',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

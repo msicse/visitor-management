@@ -8,6 +8,7 @@ use App\Models\Employee;
 use Illuminate\Support\Str;
 use App\Models\VisitorGuest;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Brian2694\Toastr\Facades\Toastr;
@@ -81,7 +82,7 @@ class FrontendController extends Controller
                 'organization' => 'required|max:255',
                 'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
                 'address' => 'required',
-                'visitor_card_id' => 'required|unique:visitors,visitor_card_id',
+                'visitor_card_id' => ['required', Rule::unique('visitors', 'visitor_card_id')->whereNull('out_time')],
                 'email' => 'nullable|email',
                 'image' => 'nullable',
                 'reason' => 'required',
