@@ -48,6 +48,8 @@ Route::middleware('auth')->group(function () {
     Route::get('pending-visitors', [VisitorController::class, "pending"])->name("visitors.pending");
 
     Route::post('visitors/checkout/{id}', [App\Http\Controllers\VisitorController::class, 'checkout'])->name('visitors.checkout');
+    Route::post('visitors/guest-checkout/{id}', [App\Http\Controllers\VisitorController::class, 'checkoutGuest'])->name('visitors.guest.checkout');
+    Route::get('visitors/guests/{id}', [App\Http\Controllers\VisitorController::class, 'guestList'])->name('visitors.guest.list');
 
     // System Diagnostics Routes
     Route::get('system/diagnostics', [App\Http\Controllers\SystemDiagnosticsController::class, 'index'])

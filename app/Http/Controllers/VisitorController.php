@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Visitor;
+use App\Models\VisitorGuest;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Str;
@@ -30,7 +31,12 @@ class VisitorController extends Controller
 
     public function getData(Request $request)
     {
-        $query = Visitor::with('employee');
+        $query = Visitor::with('employee')->withCount([
+            'guests',
+            'guests as pending_guests_count' => function ($q) {
+                $q->where('is_checkout', false);
+            }
+        ]);
 
         // Custom filters passed from the filter form via DataTables ajax.data
         if ($request->filled('date_from')) {
@@ -67,7 +73,7 @@ class VisitorController extends Controller
             $totalFiltered = $query->count();
         }
 
-        // Column ordering
+        // Column ordering (col 9 = guests_count, col 10 = to whom, col 11 = reason, col 12 = action)
         $columnMap = [
             2 => 'visitor_card_id',
             3 => 'name',
@@ -76,7 +82,7 @@ class VisitorController extends Controller
             6 => 'in_time',
             7 => 'in_time',
             8 => 'out_time',
-            10 => 'reason',
+            11 => 'reason',
         ];
         $orderColIdx = (int) $request->input('order.0.column', 6);
         $orderDir    = $request->input('order.0.dir', 'desc') === 'asc' ? 'asc' : 'desc';
@@ -92,9 +98,24 @@ class VisitorController extends Controller
             $image = $v->image
                 ? '<img src="' . asset($v->image) . '" style="height:60px;">'
                 : '';
+            $guestCount = $v->guests_count ?? 0;
+            $pendingGuestCount = $v->pending_guests_count ?? 0;
+            $guestBadge = '<span class="badge" style="background:#337ab7;color:#fff;padding:3px 7px;border-radius:10px;">T: ' . $guestCount . '</span>';
+            $guestBadge .= ' <span class="badge" style="background:' . ($pendingGuestCount > 0 ? '#d9534f' : '#777') . ';color:#fff;padding:3px 7px;border-radius:10px;">P: ' . $pendingGuestCount . '</span>';
+
             $actions = '<a href="' . route('visitors.show', $v->id) . '" class="btn btn-info waves-effect btn-sm" title="View"><i class="material-icons">visibility</i> View</a>';
+            if ($guestCount > 0) {
+                $actions .= ' <button type="button" class="btn btn-primary waves-effect btn-sm guest-list-btn"
+                    data-visitor-id="' . $v->id . '"
+                    data-visitor-name="' . e($v->name) . '"
+                    title="Guests"><i class="material-icons">group</i> Guests</button>';
+            }
             if (!$v->checkout) {
-                $actions .= ' <button type="button" class="btn btn-danger waves-effect btn-sm delete" data-delete-id="' . $v->id . '" title="Checkout"><i class="material-icons">exit_to_app</i> Checkout</button>';
+                $actions .= ' <button type="button" class="btn btn-danger waves-effect btn-sm checkout-btn"
+                    data-delete-id="' . $v->id . '"
+                    data-guest-count="' . $guestCount . '"
+                    data-visitor-name="' . e($v->name) . '"
+                    title="Checkout"><i class="material-icons">exit_to_app</i> Checkout</button>';
             }
             $data[] = [
                 $start + $i + 1,
@@ -108,6 +129,7 @@ class VisitorController extends Controller
                 $v->out_time
                     ? date('d-m-Y h:i a', strtotime($v->out_time))
                     : "<span class='text-danger'>Pending Checkout</span>",
+                $guestBadge,
                 $v->employee ? e($v->employee->name) : '',
                 e($v->reason ?? ''),
                 $actions,
@@ -239,21 +261,78 @@ class VisitorController extends Controller
         //
     }
 
-    public function checkout($id)
+    public function checkout($id, Request $request)
     {
         $visitor = Visitor::find($id);
-        $visitor->out_time = Carbon::now();
+        if (!$visitor) {
+            return response()->json(["message" => "Visitor not found", "status" => 404], 404);
+        }
+
+        $now = Carbon::now();
+        $visitor->out_time = $now;
         $visitor->checkout = 1;
         $visitor->save();
-        // Toastr::success(' Status Updated ', 'Success');
 
+        // Checkout associated guests only if checkbox was checked (default: true)
+        if ($request->boolean('with_guests', true)) {
+            $visitor->guests()
+                ->where('is_checkout', false)
+                ->update(['is_checkout' => true, 'out_time' => $now]);
+        }
 
         return response()->json([
             "message" => "Success",
             "status" => 201
         ]);
+    }
 
-        return redirect()->back();
+    public function checkoutGuest($id)
+    {
+        $guest = VisitorGuest::find($id);
+        if (!$guest) {
+            return response()->json(["message" => "Guest not found", "status" => 404], 404);
+        }
+
+        if ($guest->is_checkout) {
+            return response()->json(["message" => "Guest already checked out", "status" => 200]);
+        }
+
+        $guest->is_checkout = true;
+        $guest->out_time = Carbon::now();
+        $guest->save();
+
+        return response()->json([
+            "message" => "Guest checkout successful",
+            "status" => 201
+        ]);
+    }
+
+    public function guestList($id)
+    {
+        $visitor = Visitor::with('guests')->find($id);
+        if (!$visitor) {
+            return response()->json(["message" => "Visitor not found", "status" => 404], 404);
+        }
+
+        return response()->json([
+            "status" => 200,
+            "visitor" => [
+                "id" => $visitor->id,
+                "name" => $visitor->name,
+                "checkout" => (bool) $visitor->checkout,
+            ],
+            "guests" => $visitor->guests->map(function ($guest) {
+                return [
+                    "id" => $guest->id,
+                    "name" => $guest->name,
+                    "visitor_card_id" => $guest->visitor_card_id,
+                    "organization" => $guest->organization,
+                    "phone" => $guest->phone,
+                    "is_checkout" => (bool) $guest->is_checkout,
+                    "out_time" => $guest->out_time,
+                ];
+            }),
+        ]);
     }
 
 }

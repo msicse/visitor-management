@@ -132,8 +132,9 @@
                                     <th>In Date</th>
                                     <th>In Time </th>
                                     <th>Out</th>
+                                    <th>Guests</th>
                                     <th>To Whom</th>
-                                    <th>Reson</th>
+                                    <th>Reason</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -145,10 +146,12 @@
                                     <th>Name</th>
                                     <th>Organization</th>
                                     <th>Phone</th>
-                                    <th>In</th>
+                                    <th>In Date</th>
+                                    <th>In Time</th>
                                     <th>Out</th>
+                                    <th>Guests</th>
                                     <th>To Whom</th>
-                                    <th>Reson</th>
+                                    <th>Reason</th>
                                     <th>Action</th>
                                 </tr>
                             </tfoot>
@@ -161,6 +164,66 @@
         </div>
     </div>
     <!-- #END# Exportable Table -->
+</div>
+
+{{-- Checkout Modal --}}
+<div class="modal fade" id="checkoutModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Checkout Visitor</h4>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to checkout <strong id="checkoutVisitorName"></strong>?</p>
+                <div id="checkoutGuestOption" style="display:none;margin-top:10px;">
+                    <div class="checkbox">
+                        <input type="checkbox" id="checkoutAllGuests" class="filled-in" checked>
+                        <label for="checkoutAllGuests">Also checkout all <strong id="checkoutGuestCount"></strong> guest(s)</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmCheckoutBtn">Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="guestListModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Guest List: <span id="guestListVisitorName"></span></h4>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Card No</th>
+                                <th>Name</th>
+                                <th>Organization</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Out Time</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guestListTableBody">
+                            <tr><td colspan="8" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -219,6 +282,7 @@
                     { title: 'In Date' },
                     { title: 'In Time' },
                     { title: 'Out' },
+                    { title: 'Guests',       orderable: false },
                     { title: 'To Whom',      orderable: false },
                     { title: 'Reason' },
                     { title: 'Action',       orderable: false, searchable: false },
@@ -240,24 +304,142 @@
                 table.ajax.reload();
             });
 
-            // Checkout button (delegated - works on dynamically loaded rows)
-            $(document).on('click', '.delete', function () {
-                if (!confirm('Press OK to Checkout')) return;
-                var data_id = $(this).data('delete-id');
-                var url = location.origin + '/visitors/checkout/' + data_id;
-                var $btn = $(this);
-                jQuery.ajax({
+            // Checkout modal trigger
+            var checkoutVisitorId  = null;
+            var selectedVisitorIdForGuests = null;
+
+            $(document).on('click', '.checkout-btn', function () {
+                var $btn       = $(this);
+                checkoutVisitorId  = $btn.data('delete-id');
+                var guestCount = parseInt($btn.data('guest-count')) || 0;
+                var visitorName = $btn.data('visitor-name') || '';
+
+                $('#checkoutVisitorName').text(visitorName);
+                $('#checkoutGuestCount').text(guestCount);
+                $('#checkoutAllGuests').prop('checked', true);
+
+                if (guestCount > 0) {
+                    $('#checkoutGuestOption').show();
+                } else {
+                    $('#checkoutGuestOption').hide();
+                }
+
+                $('#checkoutModal').modal('show');
+            });
+
+            $('#confirmCheckoutBtn').on('click', function () {
+                if (!checkoutVisitorId) return;
+                var withGuests = $('#checkoutAllGuests').is(':checked') ? 1 : 0;
+                var url = location.origin + '/visitors/checkout/' + checkoutVisitorId + '?with_guests=' + withGuests;
+
+                $('#confirmCheckoutBtn').prop('disabled', true).text('Processing...');
+
+                $.ajax({
                     url: url,
                     type: 'post',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     success: function (result) {
                         if (result.status === 201) {
-                            $btn.remove();
+                            $('#checkoutModal').modal('hide');
                             toastr.success('Successfully Checked Out', 'Success');
                             table.ajax.reload(null, false);
                         } else {
-                            toastr.error('Server not response', 'Error');
+                            toastr.error('Server not responding', 'Error');
                         }
                     },
+                    error: function () {
+                        toastr.error('An error occurred. Please try again.', 'Error');
+                    },
+                    complete: function () {
+                        checkoutVisitorId = null;
+                        $('#confirmCheckoutBtn').prop('disabled', false).text('Checkout');
+                    }
+                });
+            });
+
+            function buildGuestRows(guests) {
+                if (!guests || guests.length === 0) {
+                    return '<tr><td colspan="8" class="text-center">No guests found</td></tr>';
+                }
+
+                var rows = '';
+                $.each(guests, function (index, guest) {
+                    var statusHtml = guest.is_checkout
+                        ? '<span class="label label-success">Checked Out</span>'
+                        : '<span class="label label-danger">Pending</span>';
+
+                    var actionHtml = guest.is_checkout
+                        ? '<span class="text-muted">-</span>'
+                        : '<button type="button" class="btn btn-warning btn-xs waves-effect guest-checkout-btn" data-guest-id="' + guest.id + '"><i class="material-icons" style="font-size:14px;vertical-align:middle;">exit_to_app</i> Checkout</button>';
+
+                    rows += '<tr>' +
+                        '<td>' + (index + 1) + '</td>' +
+                        '<td>' + (guest.visitor_card_id || '-') + '</td>' +
+                        '<td>' + (guest.name || '-') + '</td>' +
+                        '<td>' + (guest.organization || '-') + '</td>' +
+                        '<td>' + (guest.phone || '-') + '</td>' +
+                        '<td>' + statusHtml + '</td>' +
+                        '<td>' + (guest.out_time || '-') + '</td>' +
+                        '<td>' + actionHtml + '</td>' +
+                        '</tr>';
+                });
+
+                return rows;
+            }
+
+            function loadGuestList(visitorId) {
+                $('#guestListTableBody').html('<tr><td colspan="8" class="text-center">Loading...</td></tr>');
+                $.ajax({
+                    url: location.origin + '/visitors/guests/' + visitorId,
+                    type: 'GET',
+                    success: function (result) {
+                        if (result.status === 200) {
+                            $('#guestListTableBody').html(buildGuestRows(result.guests));
+                        } else {
+                            $('#guestListTableBody').html('<tr><td colspan="8" class="text-center text-danger">Failed to load guests</td></tr>');
+                        }
+                    },
+                    error: function () {
+                        $('#guestListTableBody').html('<tr><td colspan="8" class="text-center text-danger">Failed to load guests</td></tr>');
+                    }
+                });
+            }
+
+            $(document).on('click', '.guest-list-btn', function () {
+                selectedVisitorIdForGuests = $(this).data('visitor-id');
+                var visitorName = $(this).data('visitor-name') || '';
+                $('#guestListVisitorName').text(visitorName);
+                $('#guestListModal').modal('show');
+                loadGuestList(selectedVisitorIdForGuests);
+            });
+
+            $(document).on('click', '#guestListTableBody .guest-checkout-btn', function () {
+                var guestId = $(this).data('guest-id');
+                var $btn = $(this);
+                if (!guestId) return;
+
+                $btn.prop('disabled', true).text('Processing...');
+                $.ajax({
+                    url: location.origin + '/visitors/guest-checkout/' + guestId,
+                    type: 'POST',
+                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    success: function (result) {
+                        if (result.status === 201 || result.status === 200) {
+                            toastr.success(result.message || 'Guest checked out', 'Success');
+                            if (selectedVisitorIdForGuests) {
+                                loadGuestList(selectedVisitorIdForGuests);
+                            }
+                            table.ajax.reload(null, false);
+                        } else {
+                            toastr.error('Server not responding', 'Error');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Failed to checkout guest', 'Error');
+                    },
+                    complete: function () {
+                        $btn.prop('disabled', false).html('<i class="material-icons" style="font-size:14px;vertical-align:middle;">exit_to_app</i> Checkout');
+                    }
                 });
             });
         });
