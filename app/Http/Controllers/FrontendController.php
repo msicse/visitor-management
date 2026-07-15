@@ -421,7 +421,7 @@ class FrontendController extends Controller
 
             // Check for active visitor (not checked out)
             $visitor = Visitor::where('visitor_card_id', $cardId)
-                        ->whereNull('out_time')
+                        ->where('checkout', false) // Assuming 'checkout' is a boolean indicating if the visitor has checked out
                         ->first();
 
             if ($visitor) {
@@ -434,7 +434,7 @@ class FrontendController extends Controller
 
             // Also check guest visitors
             $guestVisitor = VisitorGuest::where('visitor_card_id', $cardId)
-                            ->where('is_checkin', true)
+                            ->where('is_checkout', false)
                             ->first();
 
             if ($guestVisitor) {

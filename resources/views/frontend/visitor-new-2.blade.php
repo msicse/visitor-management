@@ -544,7 +544,7 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
                             success: function (result) {
-                                console.log(result);
+
                                 if (result.status === 201) {
                                     $('#employee').val(null).trigger('change');
                                     $('#addVisitorForm')[0].reset();
@@ -560,6 +560,11 @@
                                     spinnerModal.classList.add('hidden');
                                     spinnerModal.classList.remove('flex');
                                     toastr.success(result.message || 'Successfully saved', 'Success');
+
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 1000);
+
                                 } else {
                                     const spinnerModal = document.getElementById('spinnerModal');
                                     spinnerModal.classList.add('hidden');
