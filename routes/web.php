@@ -5,7 +5,7 @@ use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VisitorController;
 use Illuminate\Support\Facades\Route;
-use App\Models\Employee;
+
 
 Route::get('/', [FrontendController::class, 'index'])->name('home');
 Route::get('/test', [FrontendController::class, 'test'])->name('visitor.test');
