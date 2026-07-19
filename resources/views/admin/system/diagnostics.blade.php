@@ -56,32 +56,35 @@
                                 <tr>
                                     <th>Connection Status</th>
                                     <td>
-                                        @try
-                                            @php
-                                                DB::connection()->getPdo();
-                                                $status = true;
-                                                $message = 'Connected';
-                                            @endphp
-                                            <span class="badge badge-success">{{ $message }}</span>
-                                        @catch(\Exception $e)
-                                            @php
-                                                $status = false;
-                                                $message = $e->getMessage();
-                                            @endphp
-                                            <span class="badge badge-danger">Failed</span>
+                                        @php
+                                        try{
+                                            DB::connection()->getPdo();
+                                            $status = true;
+                                            $message = 'Connected';
+
+                                        } catch (\Exception $e) {
+                                            $status = false;
+                                            $message = $e->getMessage();
+                                        }
+                                        @endphp
+                                        <span class="badge {{ $status ? 'badge-success' : 'badge-danger' }}">{{ $message }}</span>
+                                        @if(!$status)
                                             <div class="text-danger">{{ $message }}</div>
-                                        @endtry
+                                        @endif
                                     </td>
                                 </tr>
                                 @if($status)
                                 <tr>
                                     <th>Database Version</th>
                                     <td>
-                                        @try
-                                            {{ DB::select('SELECT VERSION() as version')[0]->version }}
-                                        @catch(\Exception $e)
-                                            <span class="badge badge-warning">Unknown</span>
-                                        @endtry
+                                        @php
+                                        try {
+                                            $version = DB::select('SELECT VERSION() as version')[0]->version;
+                                        } catch (\Exception $e) {
+                                            $version = null;
+                                        }
+                                        @endphp
+                                        {{ $version ?? 'Unknown' }}
                                     </td>
                                 </tr>
                                 @endif

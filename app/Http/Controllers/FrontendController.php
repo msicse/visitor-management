@@ -102,6 +102,8 @@ class FrontendController extends Controller
                 'reason.required' => 'Reason for visit is required',
             ]);
 
+
+
             $data = $request->all();
             $slug = Str::slug($request->name);
             $img = $request->image;
@@ -197,7 +199,7 @@ class FrontendController extends Controller
                     // Validate guest data
                     if (!isset($data['guest_name']) || !is_array($data['guest_name']) || count($data['guest_name']) === 0) {
                         throw new \Illuminate\Validation\ValidationException(
-                            \Illuminate\Validation\Validator::make([], ['guest' => 'required'], ['guest.required' => 'Guest information is required'])
+                            \Illuminate\Support\Facades\Validator::make([], ['guest' => 'required'], ['guest.required' => 'Guest information is required'])
                         );
                     }
 
@@ -205,18 +207,19 @@ class FrontendController extends Controller
                         // Validate each guest's data
                         if (empty($data['guest_name'][$i]) || empty($data['guest_card_no'][$i])) {
                             throw new \Illuminate\Validation\ValidationException(
-                                \Illuminate\Validation\Validator::make([],
+                                \Illuminate\Support\Facades\Validator::make([],
                                 ['guest_details' => 'required'],
                                 ['guest_details.required' => 'Guest name and card number are required for all guests'])
                             );
                         }
 
-                        // Check for duplicate guest card numbers
+                        // Check for duplicate guest card numbers (only block if guest hasn't checked out yet)
                         if (VisitorGuest::where('visitor_card_id', $data['guest_card_no'][$i])
                                         ->where('is_checkin', true)
+                                        ->where('is_checkout', false)
                                         ->exists()) {
                             throw new \Illuminate\Validation\ValidationException(
-                                \Illuminate\Validation\Validator::make([],
+                                \Illuminate\Support\Facades\Validator::make([],
                                 ['guest_card' => 'unique'],
                                 ['guest_card.unique' => 'Guest card number ' . $data['guest_card_no'][$i] . ' is already in use'])
                             );

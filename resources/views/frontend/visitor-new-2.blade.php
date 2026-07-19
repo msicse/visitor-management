@@ -614,10 +614,6 @@
                                             $('#employee').val('').trigger('change');
                                             $('#employee').addClass('border-red-500 error-border');
 
-                                            // Reload employee list to ensure it's up to date
-                                            setTimeout(function() {
-                                                location.reload();
-                                            }, 3000);
                                         }
                                     }
 
