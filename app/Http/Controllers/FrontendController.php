@@ -73,23 +73,66 @@ class FrontendController extends Controller
     public function store(Request $request)
     {
         try {
+            $allowedVisitorTypes = ['brand', 'factory', 'trade-union', 'official'];
+
             // Implementing proper validation with custom messages
             $request->validate([
                 'employee' => 'required|integer|exists:employees,id',
                 'name' => 'required|max:255',
-                'visitor_type' => 'required|max:255',
+                'visitor_type' => ['required', Rule::in($allowedVisitorTypes)],
                 'organization' => 'required|max:255',
-                'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
-                'address' => 'required',
-                'visitor_card_id' => ['required', Rule::unique('visitors', 'visitor_card_id')->whereNull('out_time')],
-                'email' => 'nullable|email',
-                'image' => 'nullable',
-                'reason' => 'required',
+                'phone' => ['required', 'regex:/^[0-9\s\-\+\(\)]*$/', 'min:10', function ($attribute, $value, $fail) {
+                    if (strlen(preg_replace('/\D/', '', $value)) < 7) {
+                        $fail('Please enter a valid phone number.');
+                    }
+                }],
+                'address' => 'required|max:1000',
+                'visitor_card_id' => [
+                    'required',
+                    'max:255',
+                    Rule::unique('visitors', 'visitor_card_id')->whereNull('out_time'),
+                    function ($attribute, $value, $fail) {
+                        if (VisitorGuest::where('visitor_card_id', $value)->where('is_checkin', true)->where('is_checkout', false)->exists()) {
+                            $fail('This card ID is currently in use by a guest visitor.');
+                        }
+                    },
+                ],
+                'email' => 'required_if:visitor_type,brand|nullable|email',
+                'image' => ['nullable', 'regex:/^data:image\/(png|jpe?g);base64,[A-Za-z0-9+\/=]+$/', 'max:6000000'],
+                'reason' => 'required|max:1000',
+
+                'is_guest' => 'nullable|in:1,2',
+                'guest_name' => 'required_if:is_guest,1|array',
+                'guest_name.*' => 'required|max:255',
+                'guest_card_no' => 'required_if:is_guest,1|array',
+                'guest_card_no.*' => [
+                    'required',
+                    'max:255',
+                    'distinct',
+                    function ($attribute, $value, $fail) use ($request) {
+                        if ($value === $request->input('visitor_card_id')) {
+                            $fail('Guest card ID cannot be the same as the main visitor card ID.');
+                            return;
+                        }
+                        if (VisitorGuest::where('visitor_card_id', $value)->where('is_checkin', true)->where('is_checkout', false)->exists()) {
+                            $fail('Guest card ID "' . $value . '" is already in use by another guest.');
+                            return;
+                        }
+                        if (Visitor::where('visitor_card_id', $value)->whereNull('out_time')->exists()) {
+                            $fail('Guest card ID "' . $value . '" is already in use by another visitor.');
+                        }
+                    },
+                ],
+                'guest_organization.*' => 'required|max:255',
+                'guest_phone.*' => 'required|regex:/^[0-9\s\-\+\(\)]*$/',
+                'guest_email.*' => 'nullable|email',
+                'guest_address.*' => 'required',
             ], [
                 'employee.required' => 'Please select an employee to meet',
                 'employee.exists' => 'Selected employee does not exist',
                 'name.required' => 'Visitor name is required',
                 'visitor_type.required' => 'Visitor type is required',
+                'visitor_type.in' => 'Please select a valid visitor type',
                 'organization.required' => 'Organization name is required',
                 'phone.required' => 'Phone number is required',
                 'phone.regex' => 'Please enter a valid phone number',
@@ -97,8 +140,21 @@ class FrontendController extends Controller
                 'address.required' => 'Address is required',
                 'visitor_card_id.required' => 'Visitor card ID is required',
                 'visitor_card_id.unique' => 'This visitor card ID is already in use',
+                'email.required_if' => 'Email is required for brand visitors',
                 'email.email' => 'Please enter a valid email address',
+                'image.regex' => 'Visitor photo is invalid, please retake it',
                 'reason.required' => 'Reason for visit is required',
+
+                'guest_name.required_if' => 'Guest information is required',
+                'guest_name.*.required' => 'Guest name is required for all guests',
+                'guest_card_no.required_if' => 'Guest card ID is required',
+                'guest_card_no.*.required' => 'Guest card ID is required for all guests',
+                'guest_card_no.*.distinct' => 'Duplicate guest card ID in the submitted guest list',
+                'guest_organization.*.required' => 'Guest organization is required for all guests',
+                'guest_phone.*.required' => 'Guest phone is required for all guests',
+                'guest_phone.*.regex' => 'Please enter a valid guest phone number',
+                'guest_email.*.email' => 'Please enter a valid guest email address',
+                'guest_address.*.required' => 'Guest address is required for all guests',
             ]);
 
 
@@ -177,13 +233,6 @@ class FrontendController extends Controller
 
             $employee = Employee::find($request->employee);
 
-            // Double check if employee exists to prevent foreign key issues
-            if (!$employee) {
-                return redirect()->back()->withErrors([
-                    'employee' => 'The selected employee does not exist in the database. Please select a valid employee.'
-                ])->withInput();
-            }
-
             // Begin transaction
             DB::beginTransaction();
             try {
@@ -194,39 +243,12 @@ class FrontendController extends Controller
                 $data["visitor_card_id"] = $request->visitor_card_id;
                 $visitor = Visitor::create($data);
 
-                if ($data['is_guest'] == 1 ) {
-                    // Validate guest data
-                    if (!isset($data['guest_name']) || !is_array($data['guest_name']) || count($data['guest_name']) === 0) {
-                        throw new \Illuminate\Validation\ValidationException(
-                            \Illuminate\Support\Facades\Validator::make([], ['guest' => 'required'], ['guest.required' => 'Guest information is required'])
-                        );
-                    }
-
-                    for ($i = 0; $i < count($data['guest_name']); $i++) {
-                        // Validate each guest's data
-                        if (empty($data['guest_name'][$i]) || empty($data['guest_card_no'][$i])) {
-                            throw new \Illuminate\Validation\ValidationException(
-                                \Illuminate\Support\Facades\Validator::make([],
-                                ['guest_details' => 'required'],
-                                ['guest_details.required' => 'Guest name and card number are required for all guests'])
-                            );
-                        }
-
-                        // Check for duplicate guest card numbers (only block if guest hasn't checked out yet)
-                        if (VisitorGuest::where('visitor_card_id', $data['guest_card_no'][$i])
-                                        ->where('is_checkin', true)
-                                        ->where('is_checkout', false)
-                                        ->exists()) {
-                            throw new \Illuminate\Validation\ValidationException(
-                                \Illuminate\Support\Facades\Validator::make([],
-                                ['guest_card' => 'unique'],
-                                ['guest_card.unique' => 'Guest card number ' . $data['guest_card_no'][$i] . ' is already in use'])
-                            );
-                        }
-
+                if ($request->input('is_guest') == 1) {
+                    // Guest data is already fully validated above, so just persist each row
+                    foreach ($data['guest_name'] as $i => $name) {
                         $guest = new VisitorGuest();
                         $guest->visitor_id = $visitor->id;
-                        $guest->name = $data['guest_name'][$i];
+                        $guest->name = $name;
                         $guest->visitor_card_id = $data['guest_card_no'][$i];
                         $guest->organization = $data['guest_organization'][$i] ?? '';
                         $guest->phone = $data['guest_phone'][$i] ?? '';

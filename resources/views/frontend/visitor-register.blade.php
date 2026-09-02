@@ -389,12 +389,12 @@
         $("#organization-type").change(function () {
             let id = $(this).val();
 
-            if (id === 'official') {
-                $("#email").removeAttr('required');
-                $("#emailReq").addClass('hidden');
-            } else {
+            if (id === 'brand') {
                 $('#email').attr('required', 'required');
                 $("#emailReq").removeClass('hidden');
+            } else {
+                $("#email").removeAttr('required');
+                $("#emailReq").addClass('hidden');
             }
         });
 
