@@ -7,6 +7,8 @@ use App\Models\Employee;
 use App\Models\Visitor;
 use App\Models\VisitorGuest;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Str;
 use Intervention\Image\ImageManager;
@@ -170,15 +172,16 @@ class VisitorController extends Controller
     {
 
         $request->validate([
-            'employee' => 'required|integer',
+            'employee' => 'required|integer|exists:employees,id',
             'name' => 'required|max:255',
-            'factory_name' => 'required|max:255',
+            'organization' => 'required|max:255',
+            'visitor_type' => ['required', Rule::in(['brand', 'factory', 'trade-union', 'official'])],
             'phone' => 'required',
             'address' => 'required',
-            'visitor_card' => 'required',
-            'email' => '',
-            'about' => '',
-            'image' => '',
+            'visitor_card' => ['required', Rule::unique('visitors', 'visitor_card_id')->whereNull('out_time')],
+            'email' => 'nullable|email',
+            'reason' => 'required',
+            'image' => 'nullable',
         ]);
 
         $slug = Str::slug($request->name);
@@ -222,7 +225,14 @@ class VisitorController extends Controller
         $data["in_time"] = Carbon::now();
         $data["department_id"] = $employee->department_id;
         $data["visitor_card_id"] = $request->visitor_card;
-        $visitor = Visitor::create($data);
+
+        try {
+            $visitor = Visitor::create($data);
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Error creating visitor from admin form: ' . $e->getMessage());
+            Toastr::error('Failed to save visitor. Please check the submitted data and try again.', 'Error');
+            return redirect()->back()->withInput();
+        }
 
         Toastr::success(' Succesfully Saved ', 'Success');
         return redirect()->route('visitors.index');
@@ -266,6 +276,10 @@ class VisitorController extends Controller
         $visitor = Visitor::find($id);
         if (!$visitor) {
             return response()->json(["message" => "Visitor not found", "status" => 404], 404);
+        }
+
+        if ($visitor->checkout) {
+            return response()->json(["message" => "Visitor already checked out", "status" => 200]);
         }
 
         $now = Carbon::now();
@@ -329,7 +343,8 @@ class VisitorController extends Controller
                     "organization" => $guest->organization,
                     "phone" => $guest->phone,
                     "is_checkout" => (bool) $guest->is_checkout,
-                    "out_time" => $guest->out_time,
+                    "in_time" => $guest->in_time ? date('d-m-Y h:i a', strtotime($guest->in_time)) : null,
+                    "out_time" => $guest->out_time ? date('d-m-Y h:i a', strtotime($guest->out_time)) : null,
                 ];
             }),
         ]);

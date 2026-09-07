@@ -209,12 +209,13 @@
                                 <th>Organization</th>
                                 <th>Phone</th>
                                 <th>Status</th>
+                                <th>In Time</th>
                                 <th>Out Time</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="guestListTableBody">
-                            <tr><td colspan="8" class="text-center">Loading...</td></tr>
+                            <tr><td colspan="9" class="text-center">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -359,7 +360,7 @@
 
             function buildGuestRows(guests) {
                 if (!guests || guests.length === 0) {
-                    return '<tr><td colspan="8" class="text-center">No guests found</td></tr>';
+                    return '<tr><td colspan="9" class="text-center">No guests found</td></tr>';
                 }
 
                 var rows = '';
@@ -379,6 +380,7 @@
                         '<td>' + (guest.organization || '-') + '</td>' +
                         '<td>' + (guest.phone || '-') + '</td>' +
                         '<td>' + statusHtml + '</td>' +
+                        '<td>' + (guest.in_time || '-') + '</td>' +
                         '<td>' + (guest.out_time || '-') + '</td>' +
                         '<td>' + actionHtml + '</td>' +
                         '</tr>';
@@ -388,7 +390,7 @@
             }
 
             function loadGuestList(visitorId) {
-                $('#guestListTableBody').html('<tr><td colspan="8" class="text-center">Loading...</td></tr>');
+                $('#guestListTableBody').html('<tr><td colspan="9" class="text-center">Loading...</td></tr>');
                 $.ajax({
                     url: location.origin + '/visitors/guests/' + visitorId,
                     type: 'GET',
@@ -396,11 +398,11 @@
                         if (result.status === 200) {
                             $('#guestListTableBody').html(buildGuestRows(result.guests));
                         } else {
-                            $('#guestListTableBody').html('<tr><td colspan="8" class="text-center text-danger">Failed to load guests</td></tr>');
+                            $('#guestListTableBody').html('<tr><td colspan="9" class="text-center text-danger">Failed to load guests</td></tr>');
                         }
                     },
                     error: function () {
-                        $('#guestListTableBody').html('<tr><td colspan="8" class="text-center text-danger">Failed to load guests</td></tr>');
+                        $('#guestListTableBody').html('<tr><td colspan="9" class="text-center text-danger">Failed to load guests</td></tr>');
                     }
                 });
             }

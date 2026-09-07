@@ -76,8 +76,22 @@
                                         <label class="form-label">Organization Name <span
                                                 class="text-danger font-bold">*</span></label>
                                         <div class="form-line">
-                                            <input type="text" name="factory_name" class="form-control"
-                                                value="{{ old('factory_name') }}" required>
+                                            <input type="text" name="organization" class="form-control"
+                                                value="{{ old('organization') }}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group form-float">
+                                        <label class="form-label">Visitor From <span
+                                                class="text-danger font-bold">*</span></label>
+                                        <div class="form-line">
+                                            <select name="visitor_type" class="form-control show-tick" required>
+                                                <option value="">Select</option>
+                                                <option value="brand" {{ old('visitor_type') == 'brand' ? 'selected' : '' }}>Brand</option>
+                                                <option value="factory" {{ old('visitor_type') == 'factory' ? 'selected' : '' }}>Factory</option>
+                                                <option value="trade-union" {{ old('visitor_type') == 'trade-union' ? 'selected' : '' }}>Trade Union</option>
+                                                <option value="official" {{ old('visitor_type') == 'official' ? 'selected' : '' }}>Others</option>
+                                            </select>
                                         </div>
                                     </div>
 

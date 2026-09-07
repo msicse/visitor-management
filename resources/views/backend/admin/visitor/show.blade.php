@@ -91,6 +91,7 @@
                                     <th>Email</th>
                                     <th>Address</th>
                                     <th>Checkout Status</th>
+                                    <th>In Time</th>
                                     <th>Out Time</th>
                                     <th>Action</th>
                                 </tr>
@@ -112,6 +113,7 @@
                                             <span class="label label-danger">Pending</span>
                                         @endif
                                     </td>
+                                    <td>{{ $guest->in_time ?? '-' }}</td>
                                     <td>{{ $guest->out_time ?? '-' }}</td>
                                     <td>
                                         @if(!$guest->is_checkout)
@@ -128,7 +130,7 @@
                                     </td>
                                 </tr>
                                 @empty
-                                <tr><td colspan="10" class="text-center">No guests</td></tr>
+                                <tr><td colspan="11" class="text-center">No guests</td></tr>
                                 @endforelse
                             </tbody>
                         </table>

@@ -255,6 +255,7 @@ class FrontendController extends Controller
                         $guest->email = $data['guest_email'][$i] ?? '';
                         $guest->address = $data['guest_address'][$i] ?? '';
                         $guest->is_checkin = true;
+                        $guest->in_time = $data['in_time'];
                         $guest->save();
                     }
                 }

@@ -21,17 +21,17 @@ class VisitorResource extends JsonResource
             "id"=> $this->id,
             "name"=> $this->name,
             "visitor_card_id"=> $this->visitor_card_id,
-            "factory_name"=> $this->factory_name,
+            "organization"=> $this->organization,
             "phone"=> $this->phone,
             "email"=> $this->email,
             "reason"=> $this->reason,
             "address"=> $this->address,
             "remarks"=> $this->remarks,
             "checkout"=> $this->checkout,
-            "in_time"=> ( new Carbon($this->in_time))->format("H:i:s"),
-            "out_time"=> ( new Carbon($this->out_time))->format("H:i:s"),
+            "in_time"=> $this->in_time ? Carbon::parse($this->in_time)->format("H:i:s") : null,
+            "out_time"=> $this->out_time ? Carbon::parse($this->out_time)->format("H:i:s") : null,
             "image"=> $this->image ? Storage::url($this->image) : $this->image,
-            "employee" => $this->employee ? new EmployeeResource($this->employee_id) : null,
+            "employee" => $this->employee ? new EmployeeResource($this->employee) : null,
 
         ];
     }
